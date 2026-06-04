@@ -253,3 +253,68 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeSkills();
   initializeExperiences();
 });
+// ==========================================
+// SECRET ADMIN SHORTCUTS & AUTHENTICATION
+// ==========================================
+
+// Fungsi untuk memunculkan pop-up Login Admin
+function checkAdminCredentials() {
+  const username = prompt("Admin Access Required.\nMasukkan Username:");
+  
+  // Jika pengguna menekan "Cancel"
+  if (username === null) return; 
+
+  if (username === "admin") {
+    const password = prompt("Masukkan Password:");
+    
+    // Jika pengguna menekan "Cancel" saat input password
+    if (password === null) return;
+    
+    if (password === "trisyanto") {
+      // Berhasil login
+      window.location.href = 'admin.html';
+    } else {
+      alert("Akses Ditolak: Password salah!");
+    }
+  } else {
+    alert("Akses Ditolak: Username tidak ditemukan!");
+  }
+}
+
+// 1. Shortcut Keyboard (Untuk PC/Laptop): Tekan Ctrl + Alt + A
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'a') {
+    event.preventDefault();
+    checkAdminCredentials(); // Panggil pop-up login
+  }
+});
+
+// 2. Shortcut Ketukan (Untuk Mobile/HP): Ketuk teks Copyright di footer 5x dengan cepat
+let adminClickCount = 0;
+let adminClickTimer;
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Mencari teks copyright di footer
+  const copyrightText = document.querySelector('.footer-bottom p');
+  
+  if (copyrightText) {
+    // Membuat kursor seolah-olah teks biasa agar tidak mencurigakan
+    copyrightText.style.userSelect = 'none'; 
+    
+    copyrightText.addEventListener('click', () => {
+      adminClickCount++;
+      clearTimeout(adminClickTimer);
+      
+      // Jika diklik 5 kali, panggil pop-up login
+      if (adminClickCount >= 5) {
+        checkAdminCredentials(); 
+        adminClickCount = 0; // Reset hitungan setelah pop-up muncul
+      }
+      
+      // Reset hitungan jika jeda antar klik lebih dari 2 detik
+      adminClickTimer = setTimeout(() => {
+        adminClickCount = 0;
+      }, 2000); 
+    });
+  }
+});
