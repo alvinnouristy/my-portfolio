@@ -285,7 +285,7 @@ function checkAdminCredentials() {
 document.addEventListener('keydown', function(event) {
   if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'a') {
     event.preventDefault();
-    checkAdminCredentials(); // Panggil pop-up login
+    checkAdminCredentials(); // Panggil pop-up log in
   }
 });
 
