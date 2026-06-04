@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experience | Alvin Nouristy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Styling Dasar untuk Timeline Experience */
+    .experience-section {
+      padding: 8rem 2rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      min-height: calc(100vh - 200px);
+    }
+    .experience-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .experience-header h1 {
+      font-size: 2.5rem;
+      color: var(--foreground);
+      margin-bottom: 1rem;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--card-border);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 3rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2.35rem;
+      top: 0.5rem;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--background);
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+    }
+    .exp-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      transition: all 0.3s ease;
+    }
+    .exp-card:hover {
+      border-color: rgba(0, 217, 255, 0.3);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    .exp-role {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+    .exp-company {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--foreground);
+      margin-bottom: 1rem;
+    }
+    .exp-period {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      font-size: 0.8rem;
+      color: var(--foreground-muted);
+      margin-bottom: 1rem;
+    }
+    .exp-desc {
+      color: var(--foreground-muted);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    .exp-resp {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .exp-resp li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--foreground);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .exp-resp li::before {
+      content: '▹';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+    .empty-state {
+      text-align: center;
+      color: var(--foreground-muted);
+      padding: 3rem;
+      border: 1px dashed var(--card-border);
+      border-radius: var(--radius);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+        Portfolio
+      </a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+        <span class="hamburger"></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="experience.html" class="nav-link active">Experience</a></li>
+        <li><a href="projects.html" class="nav-link">Projects</a></li>
+        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="experience-section">
+    <div class="experience-header">
+      <h1>Professional Experience</h1>
+      <p style="color: var(--foreground-muted);">My journey, roles, and responsibilities.</p>
+    </div>
+
+    <div class="timeline" id="experienceContainer">
+      <div class="empty-state">Loading experiences...</div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+            Portfolio
+          </a>
+          <p class="footer-tagline">Engineering the Future</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alvin Nouristy. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('experienceContainer');
+      
+      if (window.portfolioUtils) {
+        const experiences = window.portfolioUtils.getExperiences();
+        
+        if (experiences.length === 0) {
+          container.innerHTML = '<div class="empty-state">No experience data available yet. Please add them from the Admin panel.</div>';
+          return;
+        }
+
+        container.innerHTML = experiences.map(exp => `
+          <div class="timeline-item">
+            <div class="exp-card">
+              <h3 class="exp-role">${exp.role}</h3>
+              <p class="exp-company">${exp.company}</p>
+              <div class="exp-period">${exp.period}</div>
+              ${exp.description ? `<p class="exp-desc">${exp.description}</p>` : ''}
+              ${exp.responsibilities && exp.responsibilities.length > 0 ? `
+                <ul class="exp-resp">
+                  ${exp.responsibilities.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+              ` : ''}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = '<div class="empty-state">Error loading scripts.</div>';
+      }
+    });
+  </script>
+</body>
+</html>
