@@ -39,6 +39,40 @@
         return;
       }
 
+      // ==========================================
+      // LOGIKA PEMUTAR VIDEO (YOUTUBE / MP4)
+      // ==========================================
+      let videoHtml = '';
+      if (project.video) {
+        let embedUrl = project.video;
+        
+        // Cek jika ini link YouTube biasa, ubah otomatis jadi link Embed
+        if (embedUrl.includes('youtube.com/watch?v=')) {
+          let videoId = embedUrl.split('v=')[1];
+          const ampersandPosition = videoId.indexOf('&');
+          if (ampersandPosition !== -1) videoId = videoId.substring(0, ampersandPosition);
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        } else if (embedUrl.includes('youtu.be/')) {
+          let videoId = embedUrl.split('youtu.be/')[1];
+          const questionMarkPosition = videoId.indexOf('?');
+          if (questionMarkPosition !== -1) videoId = videoId.substring(0, questionMarkPosition);
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        // Tampilkan sebagai iframe Video YouTube yang Responsive
+        videoHtml = `
+          <div style="margin-top: 3rem; margin-bottom: 2rem;">
+            <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Video Demonstrasi</h3>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid #30363d; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+              <iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
+            </div>
+          </div>
+        `;
+      }
+
+      // ==========================================
+      // LOGIKA GALERI FOTO
+      // ==========================================
       let galleryHtml = '';
       if (project.images && project.images.length > 0) {
         galleryHtml = `
@@ -74,6 +108,9 @@
 
         <section class="project-details" style="padding-top: 1.5rem;">
           <div class="container" style="max-width: 800px; margin: 0 auto;">
+            
+            ${videoHtml}
+
             <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 2rem;">
               <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Overview</h3>
               <p style="color: #8b949e; line-height: 1.8; margin-bottom: 2rem;">${project.description}</p>
@@ -83,7 +120,9 @@
                 ${(project.technologies || []).map(tech => `<span style="background: #21262d; color: #c9d1d9; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.85rem; border: 1px solid #30363d;">${tech}</span>`).join('')}
               </div>
             </div>
+            
             ${galleryHtml}
+            
           </div>
         </section>
       `;

@@ -92,59 +92,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ==========================================
-  // 3. FORM KONTAK TELEGRAM & HITUNG MUNDUR
+ // ==========================================
+  // 3. FORM KONTAK (REAL-TIME LOKAL & TELEGRAM)
   // ==========================================
   let isCooldown = false; 
   const contactForm = document.getElementById('contactForm');
 
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
-      e.preventDefault(); // Mencegah website reload
+      e.preventDefault();
       
       if (isCooldown) {
         alert('Mohon tunggu beberapa detik sebelum mengirim pesan lagi.');
         return;
       }
 
-      const submitBtn = document.getElementById('submitBtn');
+      const submitBtn = document.getElementById('submitBtn') || contactForm.querySelector('button[type="submit"]');
       const btnText = submitBtn.querySelector('.btn-text') || submitBtn;
       const originalText = btnText.textContent;
       
       submitBtn.disabled = true;
-      btnText.textContent = 'Sending...';
+      btnText.textContent = 'Menyimpan...';
 
-      // Ambil data form
       const formData = new FormData(contactForm);
+      const msgId = Date.now(); // Buat ID unik untuk pesan
+
+      // Ambil data form dengan sangat aman
       const data = {
-        name: formData.get('from_name') || document.getElementById('name').value,
-        email: formData.get('from_email') || document.getElementById('email').value,
-        subject: formData.get('subject') || document.getElementById('subject').value,
-        message: formData.get('message') || document.getElementById('message').value
+        id: msgId,
+        name: formData.get('from_name') || formData.get('name') || document.getElementById('name')?.value || 'Tanpa Nama',
+        email: formData.get('from_email') || formData.get('email') || document.getElementById('email')?.value || 'Tanpa Email',
+        subject: formData.get('subject') || document.getElementById('subject')?.value || '-',
+        message: formData.get('message') || document.getElementById('message')?.value || '-',
+        timestamp: new Date().toISOString(),
+        status: 'terkirim_lokal' // Status awal langsung tersimpan!
       };
 
-      const textMessage = `🔔 *PESAN BARU DARI WEBSITE PORTFOLIO!* 🔔\n\n*Nama:* ${data.name}\n*Email:* ${data.email}\n*Subjek:* ${data.subject}\n\n*Pesan:*\n${data.message}`;
+      // --- LANGKAH 1: SIMPAN LANGSUNG KE INBOX (REAL-TIME) ---
+      let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+      messages.push(data);
+      localStorage.setItem('contactMessages', JSON.stringify(messages));
+      // Sekarang pesan sudah pasti ada di Admin, apapun yang terjadi pada Telegram!
+
+      // --- LANGKAH 2: KIRIM KE TELEGRAM ---
+      btnText.textContent = 'Sending Message...';
+      const textMessage = `🔔 *PESAN BARU!* 🔔\n\n*Nama:* ${data.name}\n*Email:* ${data.email}\n*Subjek:* ${data.subject}\n\n*Pesan:*\n${data.message}`;
       const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
       try {
         const response = await fetch(telegramUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: textMessage,
-            parse_mode: 'Markdown'
-          })
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: textMessage, parse_mode: 'Markdown' })
         });
 
+        // --- LANGKAH 3: UPDATE STATUS JIKA TELEGRAM SUKSES/GAGAL ---
+        messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+        const index = messages.findIndex(m => m.id === msgId);
+
         if (response.ok) {
-          alert('Terima kasih! Pesan Anda telah berhasil dikirim ke Telegram.');
+          if (index > -1) messages[index].status = 'sukses_tele';
+          localStorage.setItem('contactMessages', JSON.stringify(messages));
+          
+          alert('Message Sent Successfully');
           contactForm.reset();
           
-          // Mulai Hitung Mundur 10 Detik
+          // Hitung Mundur
           isCooldown = true;
           let timeLeft = 10;
-          
           submitBtn.style.background = '#30363d';
           submitBtn.style.color = '#8b949e';
           submitBtn.style.cursor = 'not-allowed';
@@ -152,12 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const countdownInterval = setInterval(() => {
             btnText.textContent = `Tunggu ${timeLeft}s...`;
             timeLeft--;
-            
             if (timeLeft < 0) {
               clearInterval(countdownInterval);
               isCooldown = false;
               submitBtn.disabled = false;
-              btnText.textContent = 'Send Message'; 
+              btnText.textContent = originalText; 
               submitBtn.style.background = ''; 
               submitBtn.style.color = '';
               submitBtn.style.cursor = '';
@@ -165,18 +179,24 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 1000);
 
         } else {
-          alert('Gagal mengirim pesan. Token/ID Telegram mungkin salah.');
+          if (index > -1) messages[index].status = 'gagal_tele';
+          localStorage.setItem('contactMessages', JSON.stringify(messages));
+          alert('Pesan sudah masuk di Inbox Admin, tetapi gagal diteruskan ke Telegram.');
           submitBtn.disabled = false;
           btnText.textContent = originalText;
         }
       } catch (error) {
-        alert('Terjadi kesalahan jaringan saat mengirim pesan.');
+        messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+        const index = messages.findIndex(m => m.id === msgId);
+        if (index > -1) messages[index].status = 'gagal_tele';
+        localStorage.setItem('contactMessages', JSON.stringify(messages));
+        
+        alert('Koneksi bermasalah. Pesan telah diamankan di Inbox Admin.');
         submitBtn.disabled = false;
         btnText.textContent = originalText;
       }
     });
   }
-
   // ==========================================
   // SECRET ADMIN SHORTCUTS
   // ==========================================

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Admin Dashboard">
   <meta name="theme-color" content="#0D1117">
   <title>Admin Dashboard | Portfolio</title>
   <link rel="stylesheet" href="styles.css">
@@ -15,10 +14,9 @@
     .admin-btn { background: #238636; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
     .admin-btn:hover { background: #2ea043; }
     .admin-btn-secondary { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; }
-    .admin-btn-secondary:hover { background: #30363d; }
-    .admin-btn-edit { background: #1f6feb; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; }
+    .admin-btn-edit { background: #1f6feb; padding: 0.5rem 1rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; transition: background 0.2s;}
     .admin-btn-edit:hover { background: #388bfd; }
-    .admin-btn-danger { background: #da3633; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .admin-btn-danger { background: #da3633; padding: 0.5rem 1rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s;}
     .admin-btn-danger:hover { background: #f85149; }
     .item-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #30363d; }
     .item-row:last-child { border-bottom: none; }
@@ -39,9 +37,12 @@
     <div class="container">
       <div style="margin-bottom: 3rem;">
         <h1 style="color: #c9d1d9; font-size: 2.5rem;">Dashboard</h1>
-        <p style="color: #ff7b72; font-weight: 500; background: rgba(255,123,114,0.1); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,123,114,0.3); margin-top: 1rem;">
-          ⚠️ PENTING: Kompres gambar hingga di bawah 300KB per foto sebelum diupload agar penyimpanan tidak penuh/error.
-        </p>
+      </div>
+
+      <div class="admin-section">
+        <h2 style="color: #58a6ff; margin-bottom: 1.5rem;">📥 Inbox Pesan Masuk</h2>
+        <div id="adminMessagesList" style="display: flex; flex-direction: column; gap: 1rem;">
+          </div>
       </div>
 
       <div class="admin-section">
@@ -54,10 +55,12 @@
               <textarea id="p-desc" class="admin-input" placeholder="Main Description" rows="3" required></textarea>
               <input type="text" id="p-tech" class="admin-input" placeholder="Technologies (comma separated)" required>
               
+              <input type="text" id="p-video" class="admin-input" placeholder="Link Video YouTube (Opsional) - Tempel URL disini">
+
               <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
-                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi (Opsional)</h3>
+                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi Foto (Opsional)</h3>
                 <div id="imageFieldsContainer"></div>
-                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainer', 'p')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo to Dokumentasi</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainer', 'p')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo</button>
               </div>
 
               <div style="display: flex; gap: 1rem;">
@@ -84,9 +87,9 @@
               <textarea id="e-desc" class="admin-input" placeholder="Description" rows="3" required></textarea>
               
               <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
-                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi (Opsional)</h3>
+                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi Foto (Opsional)</h3>
                 <div id="imageFieldsContainerExp"></div>
-                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainerExp', 'e')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo to Dokumentasi</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainerExp', 'e')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo</button>
               </div>
 
               <div style="display: flex; gap: 1rem;">
@@ -110,7 +113,6 @@
               <input type="text" id="s-title" class="admin-input" placeholder="Skill Title" required>
               <textarea id="s-desc" class="admin-input" placeholder="Short Description" rows="2" required></textarea>
               <input type="text" id="s-tags" class="admin-input" placeholder="Tags (comma separated)" required>
-              
               <div style="display: flex; gap: 1rem;">
                 <button type="submit" id="btn-submit-skill" class="admin-btn" style="flex: 1; padding: 1rem;">Add New Skill</button>
                 <button type="button" id="btn-cancel-skill" class="admin-btn admin-btn-secondary" style="display: none; padding: 1rem;" onclick="resetSkillForm()">Cancel Edit</button>
@@ -123,210 +125,190 @@
           </div>
         </div>
       </div>
-
     </div>
   </main>
 
   <script src="js/main.js"></script>
-  
   <script>
     let imageFieldCount = 0;
-    
-    // Variabel untuk melacak status Edit
     let editingProjectIdx = -1;
     let editingExpIdx = -1;
     let editingSkillIdx = -1;
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (!window.portfolioUtils) {
-        alert("Error: Database main.js tidak terbaca!");
-        return;
-      }
-      loadAdminData();
+      loadMessages(); 
+      loadAdminData(); 
     });
 
-    // -----------------------------------------
-    // LOAD DATA KE DAFTAR KANAN
-    // -----------------------------------------
-    function loadAdminData() {
-      // Load Projects
-      const projects = window.portfolioUtils.getProjects();
-      document.getElementById('adminProjectsList').innerHTML = projects.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : projects.map((p, index) => `
-        <div class="item-row">
-          <span style="color: #c9d1d9; font-weight: 500;">${p.title}</span>
-          <div>
-            <button type="button" onclick="editProject(${index})" class="admin-btn-edit">Edit</button>
-            <button type="button" onclick="deleteItem('project', ${index})" class="admin-btn-danger">Delete</button>
-          </div>
-        </div>
-      `).join('');
-
-      // Load Experience
-      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
-      const experience = expFunction ? expFunction() : [];
-      document.getElementById('adminExpList').innerHTML = experience.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : experience.map((e, index) => `
-        <div class="item-row">
-          <span style="color: #c9d1d9; font-weight: 500;">${e.title || e.role}</span>
-          <div>
-            <button type="button" onclick="editExperience(${index})" class="admin-btn-edit">Edit</button>
-            <button type="button" onclick="deleteItem('experience', ${index})" class="admin-btn-danger">Delete</button>
-          </div>
-        </div>
-      `).join('');
-
-      // Load Skills
-      const skills = window.portfolioUtils.getSkills();
-      document.getElementById('adminSkillsList').innerHTML = skills.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : skills.map((s, index) => `
-        <div class="item-row">
-          <span style="color: #c9d1d9; font-weight: 500;">${s.title}</span>
-          <div>
-            <button type="button" onclick="editSkill(${index})" class="admin-btn-edit">Edit</button>
-            <button type="button" onclick="deleteItem('skill', ${index})" class="admin-btn-danger">Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // -----------------------------------------
-    // FUNGSI EDIT (MEMUAT DATA KE FORM)
-    // -----------------------------------------
-    function editProject(index) {
-      const p = window.portfolioUtils.getProjects()[index];
-      document.getElementById('p-title').value = p.title;
-      document.getElementById('p-category').value = p.category || '';
-      document.getElementById('p-desc').value = p.description;
-      document.getElementById('p-tech').value = (p.technologies || []).join(', ');
+    // ==========================================
+    // FUNGSI INBOX PESAN & BALAS VIA GMAIL
+    // ==========================================
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+      const msgList = document.getElementById('adminMessagesList');
       
-      const container = document.getElementById('imageFieldsContainer');
-      container.innerHTML = ''; // Bersihkan gambar lama di form
-      if(p.images) {
-        p.images.forEach(img => addImageField('imageFieldsContainer', 'p', img));
+      if (messages.length === 0) {
+        msgList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 3rem; background: #0d1117; border: 1px dashed #30363d; border-radius: 8px;">Kotak masuk kosong.</div>';
+        return;
       }
 
+      let html = '';
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const msg = messages[i];
+        const date = msg.timestamp ? new Date(msg.timestamp).toLocaleString('id-ID') : '-';
+        
+        const senderName = msg.name || msg.from_name || 'Tanpa Nama';
+        const senderEmail = msg.email || msg.from_email || '';
+        const msgSubject = msg.subject || '-';
+        const msgBody = msg.message || '';
+
+        let teleStatus = '';
+        if (msg.status === 'sukses_tele' || msg.status === 'sent') {
+          teleStatus = '<span style="background: rgba(63, 185, 80, 0.1); color: #3fb950; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">✅ Terkirim ke Telegram</span>';
+        } else if (msg.status === 'gagal_tele' || msg.status === 'failed') {
+          teleStatus = '<span style="background: rgba(248, 81, 73, 0.1); color: #f85149; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">❌ Gagal/Draft</span>';
+        } else {
+          teleStatus = '<span style="background: rgba(210, 153, 34, 0.1); color: #d29922; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">💾 Disimpan Lokal</span>';
+        }
+
+        const gmailSubject = encodeURIComponent("Re: " + msgSubject);
+        const gmailBody = encodeURIComponent(`\n\n\n--------------------------------\nMembalas pesan dari: ${senderName} (${senderEmail})\nPada: ${date}\n\n"${msgBody}"`);
+        const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${senderEmail}&su=${gmailSubject}&body=${gmailBody}`;
+
+        html += `
+          <div style="background: #0d1117; border-left: 4px solid #58a6ff; padding: 1.5rem; border-radius: 8px; border-top: 1px solid #30363d; border-right: 1px solid #30363d; border-bottom: 1px solid #30363d; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="color: #c9d1d9; font-size: 1.15rem; display: block; margin-bottom: 0.2rem;">${senderName}</strong> 
+                <a href="mailto:${senderEmail}" style="color: #58a6ff; font-size: 0.9rem; text-decoration: none;">${senderEmail}</a>
+              </div>
+              <div style="text-align: right;">${teleStatus}<div style="color: #8b949e; font-size: 0.8rem; margin-top: 0.8rem;">${date}</div></div>
+            </div>
+            <div style="color: #c9d1d9; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.8rem;">Topik: ${msgSubject}</div>
+            <div style="color: #8b949e; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; padding: 1rem; background: #161b22; border-radius: 6px; border: 1px solid #30363d; white-space: pre-wrap;">${msgBody}</div>
+            <div style="display: flex; gap: 0.8rem;">
+              <a href="${gmailLink}" target="_blank" class="admin-btn-edit" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">✉️ Balas via Gmail</a>
+              <button onclick="deleteMessage(${i})" class="admin-btn-danger" style="display: inline-flex; align-items: center; gap: 0.4rem;">🗑️ Hapus</button>
+            </div>
+          </div>
+        `;
+      }
+      msgList.innerHTML = html;
+    }
+
+    function deleteMessage(index) {
+      if(confirm('Yakin ingin menghapus pesan ini secara permanen dari Inbox?')) {
+        const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+        messages.splice(index, 1);
+        localStorage.setItem('contactMessages', JSON.stringify(messages));
+        loadMessages();
+      }
+    }
+
+    // ==========================================
+    // LOGIKA DASHBOARD (PROJECT, SKILL, EXP)
+    // ==========================================
+    function loadAdminData() {
+      if(!window.portfolioUtils) return;
+      
+      const projects = window.portfolioUtils.getProjects();
+      document.getElementById('adminProjectsList').innerHTML = projects.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : projects.map((p, index) => `<div class="item-row"><span style="color: #c9d1d9; font-weight: 500;">${p.title}</span><div><button type="button" onclick="editProject(${index})" class="admin-btn-edit">Edit</button><button type="button" onclick="deleteItem('project', ${index})" class="admin-btn-danger">Delete</button></div></div>`).join('');
+
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+      const experience = expFunction ? expFunction() : [];
+      document.getElementById('adminExpList').innerHTML = experience.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : experience.map((e, index) => `<div class="item-row"><span style="color: #c9d1d9; font-weight: 500;">${e.title || e.role}</span><div><button type="button" onclick="editExperience(${index})" class="admin-btn-edit">Edit</button><button type="button" onclick="deleteItem('experience', ${index})" class="admin-btn-danger">Delete</button></div></div>`).join('');
+
+      const skills = window.portfolioUtils.getSkills();
+      document.getElementById('adminSkillsList').innerHTML = skills.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : skills.map((s, index) => `<div class="item-row"><span style="color: #c9d1d9; font-weight: 500;">${s.title}</span><div><button type="button" onclick="editSkill(${index})" class="admin-btn-edit">Edit</button><button type="button" onclick="deleteItem('skill', ${index})" class="admin-btn-danger">Delete</button></div></div>`).join('');
+    }
+
+    function deleteItem(type, index) {
+      if(confirm("Yakin ingin menghapus data ini?")) {
+        if (type === 'project') { let items = window.portfolioUtils.getProjects(); items.splice(index, 1); localStorage.setItem('portfolio_projects', JSON.stringify(items)); } 
+        else if (type === 'skill') { let items = window.portfolioUtils.getSkills(); items.splice(index, 1); localStorage.setItem('portfolio_skills', JSON.stringify(items)); } 
+        else if (type === 'experience') { const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience; let items = expFunction(); items.splice(index, 1); localStorage.setItem('portfolio_experience', JSON.stringify(items)); }
+        loadAdminData(); 
+      }
+    }
+
+    function editProject(index) {
+      const p = window.portfolioUtils.getProjects()[index];
+      document.getElementById('p-title').value = p.title; 
+      document.getElementById('p-category').value = p.category || '';
+      document.getElementById('p-desc').value = p.description; 
+      document.getElementById('p-tech').value = (p.technologies || []).join(', ');
+      
+      // Load Data Video Ke Dalam Form Jika Ada
+      document.getElementById('p-video').value = p.video || ''; 
+      
+      document.getElementById('imageFieldsContainer').innerHTML = '';
+      if(p.images) p.images.forEach(img => addImageField('imageFieldsContainer', 'p', img));
+      
       editingProjectIdx = index;
-      document.getElementById('btn-submit-project').textContent = "Update Project";
+      document.getElementById('btn-submit-project').textContent = "Update Project"; 
       document.getElementById('btn-submit-project').style.background = "#1f6feb";
-      document.getElementById('btn-cancel-project').style.display = "block";
+      document.getElementById('btn-cancel-project').style.display = "block"; 
       window.scrollTo({ top: document.getElementById('formProject').offsetTop - 100, behavior: 'smooth' });
     }
 
     function editExperience(index) {
-      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
-      const e = expFunction()[index];
-      document.getElementById('e-title').value = e.title || e.role;
-      document.getElementById('e-company').value = e.company;
-      document.getElementById('e-period').value = e.period;
-      document.getElementById('e-desc').value = e.description;
-
-      const container = document.getElementById('imageFieldsContainerExp');
-      container.innerHTML = '';
-      if(e.images) {
-        e.images.forEach(img => addImageField('imageFieldsContainerExp', 'e', img));
-      }
-
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience; const e = expFunction()[index];
+      document.getElementById('e-title').value = e.title || e.role; document.getElementById('e-company').value = e.company;
+      document.getElementById('e-period').value = e.period; document.getElementById('e-desc').value = e.description;
+      document.getElementById('imageFieldsContainerExp').innerHTML = '';
+      if(e.images) e.images.forEach(img => addImageField('imageFieldsContainerExp', 'e', img));
       editingExpIdx = index;
-      document.getElementById('btn-submit-exp').textContent = "Update Experience";
-      document.getElementById('btn-submit-exp').style.background = "#1f6feb";
-      document.getElementById('btn-cancel-exp').style.display = "block";
-      window.scrollTo({ top: document.getElementById('formExp').offsetTop - 100, behavior: 'smooth' });
+      document.getElementById('btn-submit-exp').textContent = "Update Experience"; document.getElementById('btn-submit-exp').style.background = "#1f6feb";
+      document.getElementById('btn-cancel-exp').style.display = "block"; window.scrollTo({ top: document.getElementById('formExp').offsetTop - 100, behavior: 'smooth' });
     }
 
     function editSkill(index) {
       const s = window.portfolioUtils.getSkills()[index];
-      document.getElementById('s-title').value = s.title;
-      document.getElementById('s-desc').value = s.description;
-      document.getElementById('s-tags').value = (s.tags || []).join(', ');
-
+      document.getElementById('s-title').value = s.title; document.getElementById('s-desc').value = s.description; document.getElementById('s-tags').value = (s.tags || []).join(', ');
       editingSkillIdx = index;
-      document.getElementById('btn-submit-skill').textContent = "Update Skill";
-      document.getElementById('btn-submit-skill').style.background = "#1f6feb";
-      document.getElementById('btn-cancel-skill').style.display = "block";
-      window.scrollTo({ top: document.getElementById('formSkill').offsetTop - 100, behavior: 'smooth' });
+      document.getElementById('btn-submit-skill').textContent = "Update Skill"; document.getElementById('btn-submit-skill').style.background = "#1f6feb";
+      document.getElementById('btn-cancel-skill').style.display = "block"; window.scrollTo({ top: document.getElementById('formSkill').offsetTop - 100, behavior: 'smooth' });
     }
 
-    // -----------------------------------------
-    // FUNGSI RESET FORM (BATAL EDIT)
-    // -----------------------------------------
-    function resetProjectForm() {
-      document.getElementById('formProject').reset();
-      document.getElementById('imageFieldsContainer').innerHTML = '';
-      editingProjectIdx = -1;
-      document.getElementById('btn-submit-project').textContent = "Add New Project";
-      document.getElementById('btn-submit-project').style.background = "#238636";
-      document.getElementById('btn-cancel-project').style.display = "none";
-    }
+    function resetProjectForm() { document.getElementById('formProject').reset(); document.getElementById('imageFieldsContainer').innerHTML = ''; editingProjectIdx = -1; document.getElementById('btn-submit-project').textContent = "Add New Project"; document.getElementById('btn-submit-project').style.background = "#238636"; document.getElementById('btn-cancel-project').style.display = "none"; }
+    function resetExpForm() { document.getElementById('formExp').reset(); document.getElementById('imageFieldsContainerExp').innerHTML = ''; editingExpIdx = -1; document.getElementById('btn-submit-exp').textContent = "Add New Experience"; document.getElementById('btn-submit-exp').style.background = "#238636"; document.getElementById('btn-cancel-exp').style.display = "none"; }
+    function resetSkillForm() { document.getElementById('formSkill').reset(); editingSkillIdx = -1; document.getElementById('btn-submit-skill').textContent = "Add New Skill"; document.getElementById('btn-submit-skill').style.background = "#238636"; document.getElementById('btn-cancel-skill').style.display = "none"; }
 
-    function resetExpForm() {
-      document.getElementById('formExp').reset();
-      document.getElementById('imageFieldsContainerExp').innerHTML = '';
-      editingExpIdx = -1;
-      document.getElementById('btn-submit-exp').textContent = "Add New Experience";
-      document.getElementById('btn-submit-exp').style.background = "#238636";
-      document.getElementById('btn-cancel-exp').style.display = "none";
-    }
-
-    function resetSkillForm() {
-      document.getElementById('formSkill').reset();
-      editingSkillIdx = -1;
-      document.getElementById('btn-submit-skill').textContent = "Add New Skill";
-      document.getElementById('btn-submit-skill').style.background = "#238636";
-      document.getElementById('btn-cancel-skill').style.display = "none";
-    }
-
-    // -----------------------------------------
-    // FUNGSI SIMPAN & DELETE DATA
-    // -----------------------------------------
     function saveProject(e) {
       e.preventDefault();
-      const imagesArray = [];
-      const imageGroups = document.getElementById('imageFieldsContainer').children;
+      const imagesArray = []; const imageGroups = document.getElementById('imageFieldsContainer').children;
       for(let i = 0; i < imageGroups.length; i++) {
         const b64Input = imageGroups[i].querySelector('input[type="hidden"]').value;
         if (b64Input) imagesArray.push({ src: b64Input, title: imageGroups[i].querySelector('input[type="text"]').value, description: imageGroups[i].querySelector('textarea').value });
       }
-
       try {
         const projects = window.portfolioUtils.getProjects();
-        const newProj = {
+        const newProj = { 
           id: editingProjectIdx > -1 ? projects[editingProjectIdx].id : Date.now().toString(), 
           title: document.getElementById('p-title').value, 
           category: document.getElementById('p-category').value, 
           description: document.getElementById('p-desc').value, 
           technologies: document.getElementById('p-tech').value.split(',').map(t => t.trim()), 
+          video: document.getElementById('p-video').value.trim(), // SIMPAN LINK VIDEO
           images: imagesArray 
         };
-        
-        if (editingProjectIdx > -1) projects[editingProjectIdx] = newProj; // Update
-        else projects.push(newProj); // Add New
-        
+        if (editingProjectIdx > -1) projects[editingProjectIdx] = newProj; else projects.push(newProj);
         localStorage.setItem('portfolio_projects', JSON.stringify(projects));
         resetProjectForm(); loadAdminData(); alert(editingProjectIdx > -1 ? "Project diperbarui!" : "Project ditambahkan!");
-      } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh. Pastikan gambar sudah dikompres."); }
+      } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh."); }
     }
 
     function saveExperience(e) {
       e.preventDefault();
-      const imagesArray = [];
-      const imageGroups = document.getElementById('imageFieldsContainerExp').children;
+      const imagesArray = []; const imageGroups = document.getElementById('imageFieldsContainerExp').children;
       for(let i = 0; i < imageGroups.length; i++) {
         const b64Input = imageGroups[i].querySelector('input[type="hidden"]').value;
         if (b64Input) imagesArray.push({ src: b64Input, title: imageGroups[i].querySelector('input[type="text"]').value, description: imageGroups[i].querySelector('textarea').value });
       }
-
       try {
-        const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
-        const experience = expFunction ? expFunction() : [];
-        const newExp = {
-          title: document.getElementById('e-title').value, 
-          company: document.getElementById('e-company').value, 
-          period: document.getElementById('e-period').value, 
-          description: document.getElementById('e-desc').value, 
-          images: imagesArray
-        };
-        
-        if (editingExpIdx > -1) experience[editingExpIdx] = newExp; // Update
-        else experience.push(newExp); // Add New
-
+        const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience; const experience = expFunction ? expFunction() : [];
+        const newExp = { title: document.getElementById('e-title').value, company: document.getElementById('e-company').value, period: document.getElementById('e-period').value, description: document.getElementById('e-desc').value, images: imagesArray };
+        if (editingExpIdx > -1) experience[editingExpIdx] = newExp; else experience.push(newExp);
         localStorage.setItem('portfolio_experience', JSON.stringify(experience));
         resetExpForm(); loadAdminData(); alert(editingExpIdx > -1 ? "Experience diperbarui!" : "Experience ditambahkan!");
       } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh."); }
@@ -335,56 +317,23 @@
     function saveSkill(e) {
       e.preventDefault();
       const skills = window.portfolioUtils.getSkills();
-      const newSkill = { 
-        title: document.getElementById('s-title').value, 
-        description: document.getElementById('s-desc').value, 
-        tags: document.getElementById('s-tags').value.split(',').map(t => t.trim()) 
-      };
-      
-      if (editingSkillIdx > -1) skills[editingSkillIdx] = newSkill; // Update
-      else skills.push(newSkill); // Add New
-
+      const newSkill = { id: editingSkillIdx > -1 ? skills[editingSkillIdx].id : Date.now().toString(), title: document.getElementById('s-title').value, description: document.getElementById('s-desc').value, tags: document.getElementById('s-tags').value.split(',').map(t => t.trim()) };
+      if (editingSkillIdx > -1) skills[editingSkillIdx] = newSkill; else skills.push(newSkill);
       localStorage.setItem('portfolio_skills', JSON.stringify(skills));
       resetSkillForm(); loadAdminData(); alert(editingSkillIdx > -1 ? "Skill diperbarui!" : "Skill ditambahkan!");
     }
 
-    function deleteItem(type, index) {
-      if(confirm("Yakin ingin menghapus data ini?")) {
-        if (type === 'project') {
-          let items = window.portfolioUtils.getProjects(); items.splice(index, 1); localStorage.setItem('portfolio_projects', JSON.stringify(items));
-        } else if (type === 'skill') {
-          let items = window.portfolioUtils.getSkills(); items.splice(index, 1); localStorage.setItem('portfolio_skills', JSON.stringify(items));
-        } else if (type === 'experience') {
-          const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
-          let items = expFunction(); items.splice(index, 1); localStorage.setItem('portfolio_experience', JSON.stringify(items));
-        }
-        loadAdminData(); 
-      }
-    }
-
-    // -----------------------------------------
-    // FUNGSI GAMBAR (DENGAN DUKUNGAN EDIT)
-    // -----------------------------------------
     function addImageField(containerId, prefix, existingImg = null) {
-      const container = document.getElementById(containerId);
-      const id = imageFieldCount++;
-      const div = document.createElement('div');
-      div.className = 'image-group';
-
-      let b64Val = existingImg ? existingImg.src : '';
-      let titleVal = existingImg ? (existingImg.title || '') : '';
-      let descVal = existingImg ? (existingImg.description || '') : '';
+      const container = document.getElementById(containerId); const id = imageFieldCount++; const div = document.createElement('div'); div.className = 'image-group';
+      let b64Val = existingImg ? existingImg.src : ''; let titleVal = existingImg ? (existingImg.title || '') : ''; let descVal = existingImg ? (existingImg.description || '') : '';
       let previewHtml = b64Val ? `<img src="${b64Val}" style="max-height: 120px; display: block; margin-bottom: 10px; border-radius: 6px; border: 1px solid #30363d;">` : '';
-
       div.innerHTML = `
         ${previewHtml}
-        <label style="color: #8b949e; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">${existingImg ? 'Ganti Gambar (Biarkan kosong jika tetap memakai foto di atas)' : 'Pilih File Gambar'}</label>
+        <label style="color: #8b949e; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">${existingImg ? 'Ganti Gambar' : 'Pilih File Gambar'}</label>
         <input type="file" accept="image/*" class="admin-input" style="padding: 0.5rem;" onchange="convertToBase64(this, '${prefix}', ${id})">
         <input type="hidden" id="${prefix}-img-b64-${id}" value="${b64Val}">
-        
         <input type="text" id="${prefix}-img-title-${id}" class="admin-input" placeholder="Photo Title" value="${titleVal}">
         <textarea id="${prefix}-img-desc-${id}" class="admin-input" placeholder="Photo Description" rows="2">${descVal}</textarea>
-        
         <button type="button" class="admin-btn-danger" style="width: 100%; margin-top: 0.5rem;" onclick="this.parentElement.remove()">Hapus Foto Ini</button>
       `;
       container.appendChild(div);
@@ -393,10 +342,8 @@
     function convertToBase64(fileInput, prefix, id) {
       const file = fileInput.files[0];
       if (file) {
-        if(file.size > 500000) alert("PERINGATAN: Ukuran file sangat besar! Harap kompres terlebih dahulu agar memori tidak error.");
-        const reader = new FileReader();
-        reader.onload = function(e) { document.getElementById(`${prefix}-img-b64-${id}`).value = e.target.result; };
-        reader.readAsDataURL(file);
+        if(file.size > 500000) alert("PERINGATAN: Ukuran file sangat besar! Harap kompres.");
+        const reader = new FileReader(); reader.onload = function(e) { document.getElementById(`${prefix}-img-b64-${id}`).value = e.target.result; }; reader.readAsDataURL(file);
       }
     }
   </script>
