@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0D1117">
-  <title>Project Details | Portfolio</title>
+  <title>Experience Details | Portfolio</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
@@ -12,45 +12,44 @@
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <a href="index.html" class="nav-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">Portfolio</a>
-      <ul class="nav-links" id="navLinks">
+      <ul class="nav-links">
         <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="experience.html" class="nav-link">Experience</a></li>
-        <li><a href="projects.html" class="nav-link active">Projects</a></li>
+        <li><a href="experience.html" class="nav-link active">Experience</a></li>
+        <li><a href="projects.html" class="nav-link">Projects</a></li>
         <li><a href="index.html#contact" class="nav-link">Contact</a></li>
       </ul>
     </div>
   </nav>
 
-  <main id="projectDetailContent" style="min-height: 70vh; padding-top: 75px; padding-bottom: 5rem;"></main>
+  <main id="expDetailContent" style="min-height: 70vh; padding-top: 75px; padding-bottom: 5rem;"></main>
 
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const contentArea = document.getElementById('projectDetailContent');
+      const contentArea = document.getElementById('expDetailContent');
       const urlParams = new URLSearchParams(window.location.search);
-      const projectId = urlParams.get('id');
-      
-      if (!window.portfolioUtils) return;
-      const projects = window.portfolioUtils.getProjects();
-      const project = projects.find(p => p.id === projectId);
+      const expId = urlParams.get('id');
 
-      if (!project) {
-        contentArea.innerHTML = '<div class="container" style="text-align:center; padding:5rem;"><h2 style="color:#c9d1d9;">Project Not Found</h2><a href="projects.html" style="color:#58a6ff;">Back to Projects</a></div>';
+      const experiences = window.portfolioUtils.getExperiences ? window.portfolioUtils.getExperiences() : window.portfolioUtils.getExperience();
+      const exp = experiences[expId];
+
+      if (!exp) {
+        contentArea.innerHTML = '<div class="container" style="text-align:center; padding:5rem;"><h2 style="color:#c9d1d9;">Experience Not Found</h2><a href="experience.html" style="color:#58a6ff;">Back to Experience</a></div>';
         return;
       }
 
       let galleryHtml = '';
-      if (project.images && project.images.length > 0) {
+      if (exp.images && exp.images.length > 0) {
         galleryHtml = `
           <div style="margin-top: 4rem;">
             <h3 style="color: #c9d1d9; font-size: 1.8rem; margin-bottom: 1.5rem; text-align: center;">Dokumentasi</h3>
             <div style="display: flex; flex-direction: column; gap: 3rem;">
-              ${project.images.map(img => `
+              ${exp.images.map(img => `
                 <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                   <img src="${img.src}" alt="${img.title}" style="width: 100%; max-height: 500px; object-fit: contain; background: #000;">
                   <div style="padding: 1.5rem;">
-                    <h4 style="color: #58a6ff; font-size: 1.25rem; margin-bottom: 0.5rem;">${img.title}</h4>
-                    <p style="color: #8b949e; line-height: 1.6;">${img.description}</p>
+                    ${img.title ? `<h4 style="color: #58a6ff; font-size: 1.25rem; margin-bottom: 0.5rem;">${img.title}</h4>` : ''}
+                    ${img.description ? `<p style="color: #8b949e; line-height: 1.6;">${img.description}</p>` : ''}
                   </div>
                 </div>
               `).join('')}
@@ -62,12 +61,13 @@
       contentArea.innerHTML = `
         <section style="padding-top: 0.5rem; padding-bottom: 1rem;">
           <div class="container">
-            <a href="projects.html" class="back-link" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #58a6ff; text-decoration: none; margin-bottom: 1rem; font-size: 0.95rem;">
-              ← Back to Projects
+            <a href="experience.html" class="back-link" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #58a6ff; text-decoration: none; margin-bottom: 1rem; font-size: 0.95rem;">
+              ← Back to Experience
             </a>
             <div style="margin-top: 0.5rem;">
-              <span style="color: #58a6ff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem;">${project.category || 'General'}</span>
-              <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">${project.title}</h1>
+              <span style="color: #58a6ff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem;">${exp.period}</span>
+              <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">${exp.role || exp.title}</h1>
+              <h2 style="font-size: 1.2rem; color: #8b949e; margin-top: 0.5rem; font-weight: 400;">${exp.company}</h2>
             </div>
           </div>
         </section>
@@ -75,13 +75,8 @@
         <section class="project-details" style="padding-top: 1.5rem;">
           <div class="container" style="max-width: 800px; margin: 0 auto;">
             <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 2rem;">
-              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Overview</h3>
-              <p style="color: #8b949e; line-height: 1.8; margin-bottom: 2rem;">${project.description}</p>
-              
-              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Technologies Used</h3>
-              <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
-                ${(project.technologies || []).map(tech => `<span style="background: #21262d; color: #c9d1d9; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.85rem; border: 1px solid #30363d;">${tech}</span>`).join('')}
-              </div>
+              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Job Description</h3>
+              <p style="color: #8b949e; line-height: 1.8;">${exp.description}</p>
             </div>
             ${galleryHtml}
           </div>

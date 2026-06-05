@@ -3,333 +3,402 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Admin - Manage Portfolio | Alvin Nouristy</title>
+  <meta name="description" content="Admin Dashboard">
+  <meta name="theme-color" content="#0D1117">
+  <title>Admin Dashboard | Portfolio</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    .admin-container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-top: 5rem; }
-    .admin-title { font-size: 1.75rem; font-weight: 700; color: var(--foreground); }
-    .project-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
-    .project-list-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); }
-    .project-list-info h3 { font-size: 1rem; font-weight: 600; color: var(--foreground); margin-bottom: 0.25rem; }
-    .project-list-info p { font-size: 0.8rem; color: var(--foreground-muted); }
-    .project-list-actions { display: flex; gap: 0.5rem; }
-    .btn-small { padding: 0.5rem 1rem; font-size: 0.8rem; }
-    .btn-danger { background: rgba(248, 81, 73, 0.1); color: var(--error); border: 1px solid rgba(248, 81, 73, 0.3); }
-    .btn-danger:hover { background: var(--error); color: white; }
-    .form-section { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; }
-    .form-section-title { font-size: 1.25rem; font-weight: 600; color: var(--foreground); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--card-border); }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-    .array-input { display: flex; flex-direction: column; gap: 0.5rem; }
-    .array-item { display: flex; gap: 0.5rem; }
-    .array-item input { flex: 1; }
-    .btn-remove { padding: 0.5rem; background: rgba(248, 81, 73, 0.1); color: var(--error); border: none; border-radius: var(--radius-sm); cursor: pointer; }
-    .btn-add { padding: 0.5rem 1rem; background: rgba(0, 217, 255, 0.1); color: var(--primary); border: 1px dashed var(--primary); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; margin-top: 0.5rem; }
-    .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--card-border); }
-    .hidden { display: none !important; }
-    .tab-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
-    .tab-btn { padding: 0.5rem 1rem; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); color: var(--foreground-muted); cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
-    .tab-btn.active { background: var(--primary); color: var(--background); border-color: var(--primary); }
-    .image-drop-zone { border: 2px dashed var(--card-border, #444); border-radius: 8px; padding: 2rem; text-align: center; transition: all 0.3s ease; background: var(--background, #111); margin-bottom: 1rem; }
-    .image-drop-zone:hover { border-color: var(--primary, #00d9ff); background: rgba(0, 217, 255, 0.05); }
-    .upload-link { color: var(--primary, #00d9ff); cursor: pointer; text-decoration: underline; font-weight: bold; }
+    .admin-section { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .admin-input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; font-family: inherit; }
+    .admin-input:focus { border-color: #58a6ff; outline: none; }
+    .admin-btn { background: #238636; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+    .admin-btn:hover { background: #2ea043; }
+    .admin-btn-secondary { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; }
+    .admin-btn-secondary:hover { background: #30363d; }
+    .admin-btn-edit { background: #1f6feb; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; }
+    .admin-btn-edit:hover { background: #388bfd; }
+    .admin-btn-danger { background: #da3633; padding: 0.4rem 0.8rem; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .admin-btn-danger:hover { background: #f85149; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #30363d; }
+    .item-row:last-child { border-bottom: none; }
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
+    .image-group { background: #0d1117; border: 1px solid #30363d; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-  <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="index.html" class="nav-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">
-        Portfolio
-      </a>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="projects.html" class="nav-link">Projects</a></li>
-      </ul>
+      <a href="index.html" class="nav-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #da3633;">Portfolio Admin</a>
+      <ul class="nav-links"><li><a href="index.html" class="nav-link">Logout</a></li></ul>
     </div>
   </nav>
 
-  <main class="admin-container">
-    <div class="admin-header">
-      <h1 class="admin-title">Admin Dashboard</h1>
-    </div>
-    
-    <!-- TABS MENU -->
-    <div class="tab-buttons">
-      <button id="listBtn" class="tab-btn active" onclick="showTab('list')">Projects</button>
-      <button id="formBtn" class="tab-btn" onclick="showTab('form')">+ Project</button>
-      <button id="skillsListBtn" class="tab-btn" onclick="showTab('skillsList')">Skills</button>
-      <button id="skillFormBtn" class="tab-btn" onclick="showTab('skillForm')">+ Skill</button>
-      <button id="expListBtn" class="tab-btn" onclick="showTab('expList')">Experiences</button>
-      <button id="expFormBtn" class="tab-btn" onclick="showTab('expForm')">+ Experience</button>
-      <button id="messagesBtn" class="tab-btn" onclick="showTab('messages')">Messages</button>
-    </div>
-    
-    <!-- 1. PROJECT LIST TAB -->
-    <div id="listTab" class="tab-content">
-      <div class="project-list" id="adminProjectList"></div>
-    </div>
-    
-    <!-- 2. PROJECT FORM TAB -->
-    <div id="formTab" class="tab-content hidden">
-      <form id="projectForm">
-        <div class="form-section">
-          <h2 class="form-section-title">Basic Information</h2>
-          <div class="form-group"><label class="form-label">Project Title *</label><input type="text" id="title" class="form-input" required></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Category *</label>
-              <select id="category" class="form-input" required>
-                <option value="IoT">IoT</option><option value="Automation">Automation</option><option value="Circuit Design">Circuit Design</option>
-                <option value="SCADA">SCADA</option><option value="Embedded Systems">Embedded Systems</option><option value="Power Electronics">Power Electronics</option>
-              </select>
-            </div>
-            <div class="form-group"><label class="form-label">Date *</label><input type="month" id="date" class="form-input" required></div>
-          </div>
-          <div class="form-group"><label class="form-label">Short Description *</label><textarea id="description" class="form-textarea" rows="2" required></textarea></div>
-          <div class="form-group"><label class="form-label">Full Overview *</label><textarea id="overview" class="form-textarea" rows="4" required></textarea></div>
-        </div>
-        <div class="form-section">
-          <h2 class="form-section-title">Arrays & Info</h2>
-          <div style="margin-bottom: 1rem;"><label class="form-label">Technologies</label><div class="array-input" id="technologiesContainer"></div><button type="button" class="btn-add" onclick="addArrayItem('technologies')">+ Tech</button></div>
-          <div style="margin-bottom: 1rem;"><label class="form-label">Features</label><div class="array-input" id="featuresContainer"></div><button type="button" class="btn-add" onclick="addArrayItem('features')">+ Feature</button></div>
-        </div>
-        <div class="form-section">
-          <h2 class="form-section-title">Images</h2>
-          <div class="image-drop-zone" id="imageDropZone"><p>Drag & drop images here or <label for="imageInput" class="upload-link">Browse</label></p><input type="file" id="imageInput" accept="image/*" multiple style="display: none;"></div>
-          <div class="image-preview-grid" id="imagePreviewGrid"></div>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="resetProjectForm()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Project</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- 3. SKILLS LIST TAB -->
-    <div id="skillsListTab" class="tab-content hidden">
-      <div class="form-section"><h2 class="form-section-title">Manage My Skills</h2><div class="project-list" id="adminSkillList"></div></div>
-    </div>
-
-    <!-- 4. SKILL FORM TAB -->
-    <div id="skillFormTab" class="tab-content hidden">
-      <form id="skillFormElement">
-        <div class="form-section">
-          <h2 class="form-section-title">Skill Detail</h2>
-          <div class="form-group"><label class="form-label">Skill Title *</label><input type="text" id="skillTitle" class="form-input" required></div>
-          <div class="form-group"><label class="form-label">Description *</label><textarea id="skillDescription" class="form-textarea" rows="3" required></textarea></div>
-          <div class="form-group"><label class="form-label">Icon (SVG Code)</label><textarea id="skillIconSvg" class="form-textarea" rows="3" placeholder="<svg>...</svg>"></textarea></div>
-          <div class="form-group" style="margin-top: 1rem;"><label class="form-label">Tags (Sub-skills)</label><div class="array-input" id="skillTagsContainer"></div><button type="button" class="btn-add" onclick="addArrayItem('skillTags')">+ Add Tag</button></div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="resetSkillForm()">Cancel</button><button type="submit" class="btn btn-primary">Save Skill</button></div>
-      </form>
-    </div>
-
-    <!-- 5. EXPERIENCES LIST TAB (NEW) -->
-    <div id="expListTab" class="tab-content hidden">
-      <div class="form-section"><h2 class="form-section-title">Manage Experiences</h2><div class="project-list" id="adminExpList"></div></div>
-    </div>
-
-    <!-- 6. EXPERIENCE FORM TAB (NEW) -->
-    <div id="expFormTab" class="tab-content hidden">
-      <form id="expFormElement">
-        <div class="form-section">
-          <h2 class="form-section-title">Experience Detail</h2>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Role / Title *</label><input type="text" id="expRole" class="form-input" required placeholder="e.g. Electrical Engineer"></div>
-            <div class="form-group"><label class="form-label">Company / Institution *</label><input type="text" id="expCompany" class="form-input" required placeholder="e.g. PT. Inovasi Tech"></div>
-          </div>
-          <div class="form-group"><label class="form-label">Period *</label><input type="text" id="expPeriod" class="form-input" required placeholder="e.g. Jan 2023 - Present"></div>
-          <div class="form-group"><label class="form-label">Short Description</label><textarea id="expDescription" class="form-textarea" rows="2"></textarea></div>
-          <div class="form-group" style="margin-top: 1rem;">
-            <label class="form-label">Key Responsibilities (Bullets)</label>
-            <div class="array-input" id="expRespContainer"></div>
-            <button type="button" class="btn-add" onclick="addArrayItem('expResp')">+ Add Responsibility</button>
-          </div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="resetExpForm()">Cancel</button><button type="submit" class="btn btn-primary">Save Experience</button></div>
-      </form>
-    </div>
-    
-    <!-- 7. MESSAGES TAB -->
-    <div id="messagesTab" class="tab-content hidden">
-      <div class="messages-section">
-        <div class="messages-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;"><h2 style="color: var(--foreground); font-size: 1.25rem;">Contact Messages</h2><button class="btn btn-danger btn-small" onclick="clearAllMessages()">Clear All</button></div>
-        <div class="messages-grid" id="messagesContainer"></div>
+  <main style="min-height: 70vh; padding-top: 100px; padding-bottom: 5rem;">
+    <div class="container">
+      <div style="margin-bottom: 3rem;">
+        <h1 style="color: #c9d1d9; font-size: 2.5rem;">Dashboard</h1>
+        <p style="color: #ff7b72; font-weight: 500; background: rgba(255,123,114,0.1); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,123,114,0.3); margin-top: 1rem;">
+          ⚠️ PENTING: Kompres gambar hingga di bawah 300KB per foto sebelum diupload agar penyimpanan tidak penuh/error.
+        </p>
       </div>
+
+      <div class="admin-section">
+        <h2 style="color: #58a6ff; margin-bottom: 1.5rem;">Manage Projects</h2>
+        <div class="admin-grid">
+          <div>
+            <form id="formProject" onsubmit="saveProject(event)">
+              <input type="text" id="p-title" class="admin-input" placeholder="Project Title" required>
+              <input type="text" id="p-category" class="admin-input" placeholder="Category (e.g. Embedded Systems)" required>
+              <textarea id="p-desc" class="admin-input" placeholder="Main Description" rows="3" required></textarea>
+              <input type="text" id="p-tech" class="admin-input" placeholder="Technologies (comma separated)" required>
+              
+              <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
+                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi (Opsional)</h3>
+                <div id="imageFieldsContainer"></div>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainer', 'p')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo to Dokumentasi</button>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <button type="submit" id="btn-submit-project" class="admin-btn" style="flex: 1; padding: 1rem;">Add New Project</button>
+                <button type="button" id="btn-cancel-project" class="admin-btn admin-btn-secondary" style="display: none; padding: 1rem;" onclick="resetProjectForm()">Cancel Edit</button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <h3 style="color: #8b949e; margin-bottom: 1rem; font-size: 1rem;">Current Projects</h3>
+            <div id="adminProjectsList" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2 style="color: #58a6ff; margin-bottom: 1.5rem;">Manage Experience</h2>
+        <div class="admin-grid">
+          <div>
+            <form id="formExp" onsubmit="saveExperience(event)">
+              <input type="text" id="e-title" class="admin-input" placeholder="Job Title / Role" required>
+              <input type="text" id="e-company" class="admin-input" placeholder="Company" required>
+              <input type="text" id="e-period" class="admin-input" placeholder="Period" required>
+              <textarea id="e-desc" class="admin-input" placeholder="Description" rows="3" required></textarea>
+              
+              <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
+                <h3 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 1rem;">Dokumentasi (Opsional)</h3>
+                <div id="imageFieldsContainerExp"></div>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="addImageField('imageFieldsContainerExp', 'e')" style="width: 100%; margin-bottom: 1rem;">+ Add Photo to Dokumentasi</button>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <button type="submit" id="btn-submit-exp" class="admin-btn" style="flex: 1; padding: 1rem;">Add New Experience</button>
+                <button type="button" id="btn-cancel-exp" class="admin-btn admin-btn-secondary" style="display: none; padding: 1rem;" onclick="resetExpForm()">Cancel Edit</button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <h3 style="color: #8b949e; margin-bottom: 1rem; font-size: 1rem;">Current Experience</h3>
+            <div id="adminExpList" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2 style="color: #58a6ff; margin-bottom: 1.5rem;">Manage Skills</h2>
+        <div class="admin-grid">
+          <div>
+            <form id="formSkill" onsubmit="saveSkill(event)">
+              <input type="text" id="s-title" class="admin-input" placeholder="Skill Title" required>
+              <textarea id="s-desc" class="admin-input" placeholder="Short Description" rows="2" required></textarea>
+              <input type="text" id="s-tags" class="admin-input" placeholder="Tags (comma separated)" required>
+              
+              <div style="display: flex; gap: 1rem;">
+                <button type="submit" id="btn-submit-skill" class="admin-btn" style="flex: 1; padding: 1rem;">Add New Skill</button>
+                <button type="button" id="btn-cancel-skill" class="admin-btn admin-btn-secondary" style="display: none; padding: 1rem;" onclick="resetSkillForm()">Cancel Edit</button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <h3 style="color: #8b949e; margin-bottom: 1rem; font-size: 1rem;">Current Skills</h3>
+            <div id="adminSkillsList" style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px;"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    
   </main>
 
   <script src="js/main.js"></script>
+  
   <script>
-    let editingProjectId = null, editingSkillId = null, editingExpId = null, uploadedImages = []; 
+    let imageFieldCount = 0;
     
+    // Variabel untuk melacak status Edit
+    let editingProjectIdx = -1;
+    let editingExpIdx = -1;
+    let editingSkillIdx = -1;
+
     document.addEventListener('DOMContentLoaded', () => {
-      if(window.portfolioUtils) {
-        loadProjectList(); loadSkillsList(); loadExpList(); loadMessages();
+      if (!window.portfolioUtils) {
+        alert("Error: Database main.js tidak terbaca!");
+        return;
       }
-      initForms();
-      
-      document.getElementById('projectForm').addEventListener('submit', saveProjectAction);
-      document.getElementById('skillFormElement').addEventListener('submit', saveSkillAction);
-      document.getElementById('expFormElement').addEventListener('submit', saveExpAction);
-      
-      const imageInput = document.getElementById('imageInput');
-      imageInput.addEventListener('change', (e) => { if(e.target.files.length > 0) handleFiles(Array.from(e.target.files)); e.target.value = ''; });
-      const dropZone = document.getElementById('imageDropZone');
-      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
-      dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = ''; });
-      dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.style.borderColor = ''; if (e.dataTransfer.files) handleFiles(Array.from(e.dataTransfer.files)); });
+      loadAdminData();
     });
 
-    // --- TAB MANAGEMENT ---
-    function showTab(tab) {
-      const allTabs = ['list', 'form', 'skillsList', 'skillForm', 'expList', 'expForm', 'messages'];
-      allTabs.forEach(t => {
-        document.getElementById(t + 'Btn').classList.toggle('active', t === tab);
-        document.getElementById(t + 'Tab').classList.toggle('hidden', t !== tab);
-      });
-      if (tab === 'messages') loadMessages();
-      if (tab === 'list') loadProjectList();
-      if (tab === 'skillsList') loadSkillsList();
-      if (tab === 'expList') loadExpList();
-    }
+    // -----------------------------------------
+    // LOAD DATA KE DAFTAR KANAN
+    // -----------------------------------------
+    function loadAdminData() {
+      // Load Projects
+      const projects = window.portfolioUtils.getProjects();
+      document.getElementById('adminProjectsList').innerHTML = projects.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : projects.map((p, index) => `
+        <div class="item-row">
+          <span style="color: #c9d1d9; font-weight: 500;">${p.title}</span>
+          <div>
+            <button type="button" onclick="editProject(${index})" class="admin-btn-edit">Edit</button>
+            <button type="button" onclick="deleteItem('project', ${index})" class="admin-btn-danger">Delete</button>
+          </div>
+        </div>
+      `).join('');
 
-    function notify(msg, type) { if (window.portfolioUtils) window.portfolioUtils.showToast(msg, type); else alert(msg); }
-    function generateId(title) { return title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').slice(0, 50); }
+      // Load Experience
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+      const experience = expFunction ? expFunction() : [];
+      document.getElementById('adminExpList').innerHTML = experience.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : experience.map((e, index) => `
+        <div class="item-row">
+          <span style="color: #c9d1d9; font-weight: 500;">${e.title || e.role}</span>
+          <div>
+            <button type="button" onclick="editExperience(${index})" class="admin-btn-edit">Edit</button>
+            <button type="button" onclick="deleteItem('experience', ${index})" class="admin-btn-danger">Delete</button>
+          </div>
+        </div>
+      `).join('');
 
-    function initForms() {
-      addArrayItem('technologies'); addArrayItem('features'); addArrayItem('skillTags'); addArrayItem('expResp');
-    }
-
-    function addArrayItem(prefix, value = '') {
-      const container = document.getElementById(`${prefix}Container`);
-      const div = document.createElement('div'); div.className = 'array-item';
-      div.innerHTML = `<input type="text" class="form-input" value="${value}" placeholder="Enter detail..."><button type="button" class="btn-remove" onclick="this.parentElement.remove()">X</button>`;
-      container.appendChild(div);
-    }
-
-    function getArrayValues(prefix) {
-      const container = document.getElementById(`${prefix}Container`);
-      if(!container) return [];
-      return Array.from(container.querySelectorAll('input')).map(inp => inp.value.trim()).filter(val => val);
-    }
-
-    // --- EXPERIENCE MANAGEMENT (NEW) ---
-    function loadExpList() {
-      if(!window.portfolioUtils) return;
-      const exps = window.portfolioUtils.getExperiences();
-      document.getElementById('adminExpList').innerHTML = exps.map(e => `
-        <div class="project-list-item">
-          <div class="project-list-info"><h3>${e.role}</h3><p>${e.company} | ${e.period}</p></div>
-          <div class="project-list-actions">
-            <button class="btn btn-secondary btn-small" onclick="editExp('${e.id}')">Edit</button>
-            <button class="btn btn-danger btn-small" onclick="deleteExp('${e.id}')">Delete</button>
+      // Load Skills
+      const skills = window.portfolioUtils.getSkills();
+      document.getElementById('adminSkillsList').innerHTML = skills.length === 0 ? '<div style="padding: 1rem; color: #8b949e;">Kosong</div>' : skills.map((s, index) => `
+        <div class="item-row">
+          <span style="color: #c9d1d9; font-weight: 500;">${s.title}</span>
+          <div>
+            <button type="button" onclick="editSkill(${index})" class="admin-btn-edit">Edit</button>
+            <button type="button" onclick="deleteItem('skill', ${index})" class="admin-btn-danger">Delete</button>
           </div>
         </div>
       `).join('');
     }
 
-    function editExp(id) {
-      if(!window.portfolioUtils) return;
-      const e = window.portfolioUtils.getExperienceById(id);
-      if(!e) return;
-      editingExpId = id;
-      document.getElementById('expRole').value = e.role;
-      document.getElementById('expCompany').value = e.company;
-      document.getElementById('expPeriod').value = e.period;
-      document.getElementById('expDescription').value = e.description || '';
-      document.getElementById('expRespContainer').innerHTML = '';
-      (e.responsibilities || []).forEach(val => addArrayItem('expResp', val));
-      if (!e.responsibilities?.length) addArrayItem('expResp');
-      showTab('expForm');
-    }
-
-    function saveExpAction(e) {
-      e.preventDefault();
-      const exp = {
-        id: editingExpId || generateId(document.getElementById('expRole').value + '-' + document.getElementById('expCompany').value),
-        role: document.getElementById('expRole').value,
-        company: document.getElementById('expCompany').value,
-        period: document.getElementById('expPeriod').value,
-        description: document.getElementById('expDescription').value,
-        responsibilities: getArrayValues('expResp')
-      };
-      window.portfolioUtils.saveExperience(exp);
-      notify('Experience saved!', 'success');
-      resetExpForm(); showTab('expList');
-    }
-
-    function deleteExp(id) {
-      if (confirm('Delete this experience?')) {
-        window.portfolioUtils.deleteExperience(id);
-        notify('Experience deleted', 'success'); loadExpList();
+    // -----------------------------------------
+    // FUNGSI EDIT (MEMUAT DATA KE FORM)
+    // -----------------------------------------
+    function editProject(index) {
+      const p = window.portfolioUtils.getProjects()[index];
+      document.getElementById('p-title').value = p.title;
+      document.getElementById('p-category').value = p.category || '';
+      document.getElementById('p-desc').value = p.description;
+      document.getElementById('p-tech').value = (p.technologies || []).join(', ');
+      
+      const container = document.getElementById('imageFieldsContainer');
+      container.innerHTML = ''; // Bersihkan gambar lama di form
+      if(p.images) {
+        p.images.forEach(img => addImageField('imageFieldsContainer', 'p', img));
       }
+
+      editingProjectIdx = index;
+      document.getElementById('btn-submit-project').textContent = "Update Project";
+      document.getElementById('btn-submit-project').style.background = "#1f6feb";
+      document.getElementById('btn-cancel-project').style.display = "block";
+      window.scrollTo({ top: document.getElementById('formProject').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    function editExperience(index) {
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+      const e = expFunction()[index];
+      document.getElementById('e-title').value = e.title || e.role;
+      document.getElementById('e-company').value = e.company;
+      document.getElementById('e-period').value = e.period;
+      document.getElementById('e-desc').value = e.description;
+
+      const container = document.getElementById('imageFieldsContainerExp');
+      container.innerHTML = '';
+      if(e.images) {
+        e.images.forEach(img => addImageField('imageFieldsContainerExp', 'e', img));
+      }
+
+      editingExpIdx = index;
+      document.getElementById('btn-submit-exp').textContent = "Update Experience";
+      document.getElementById('btn-submit-exp').style.background = "#1f6feb";
+      document.getElementById('btn-cancel-exp').style.display = "block";
+      window.scrollTo({ top: document.getElementById('formExp').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    function editSkill(index) {
+      const s = window.portfolioUtils.getSkills()[index];
+      document.getElementById('s-title').value = s.title;
+      document.getElementById('s-desc').value = s.description;
+      document.getElementById('s-tags').value = (s.tags || []).join(', ');
+
+      editingSkillIdx = index;
+      document.getElementById('btn-submit-skill').textContent = "Update Skill";
+      document.getElementById('btn-submit-skill').style.background = "#1f6feb";
+      document.getElementById('btn-cancel-skill').style.display = "block";
+      window.scrollTo({ top: document.getElementById('formSkill').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    // -----------------------------------------
+    // FUNGSI RESET FORM (BATAL EDIT)
+    // -----------------------------------------
+    function resetProjectForm() {
+      document.getElementById('formProject').reset();
+      document.getElementById('imageFieldsContainer').innerHTML = '';
+      editingProjectIdx = -1;
+      document.getElementById('btn-submit-project').textContent = "Add New Project";
+      document.getElementById('btn-submit-project').style.background = "#238636";
+      document.getElementById('btn-cancel-project').style.display = "none";
     }
 
     function resetExpForm() {
-      editingExpId = null; document.getElementById('expFormElement').reset();
-      document.getElementById('expRespContainer').innerHTML = ''; addArrayItem('expResp');
+      document.getElementById('formExp').reset();
+      document.getElementById('imageFieldsContainerExp').innerHTML = '';
+      editingExpIdx = -1;
+      document.getElementById('btn-submit-exp').textContent = "Add New Experience";
+      document.getElementById('btn-submit-exp').style.background = "#238636";
+      document.getElementById('btn-cancel-exp').style.display = "none";
     }
 
-    // --- SKILLS MANAGEMENT ---
-    function loadSkillsList() {
-      if(!window.portfolioUtils) return;
-      document.getElementById('adminSkillList').innerHTML = window.portfolioUtils.getSkills().map(skill => `
-        <div class="project-list-item"><div class="project-list-info"><h3>${skill.title}</h3><p>${(skill.tags || []).join(', ')}</p></div><div class="project-list-actions"><button class="btn btn-secondary btn-small" onclick="editSkill('${skill.id}')">Edit</button><button class="btn btn-danger btn-small" onclick="deleteSkill('${skill.id}')">Delete</button></div></div>
-      `).join('');
+    function resetSkillForm() {
+      document.getElementById('formSkill').reset();
+      editingSkillIdx = -1;
+      document.getElementById('btn-submit-skill').textContent = "Add New Skill";
+      document.getElementById('btn-submit-skill').style.background = "#238636";
+      document.getElementById('btn-cancel-skill').style.display = "none";
     }
-    function editSkill(id) {
-      if(!window.portfolioUtils) return;
-      const skill = window.portfolioUtils.getSkillById(id);
-      if(!skill) return;
-      editingSkillId = id; document.getElementById('skillTitle').value = skill.title; document.getElementById('skillDescription').value = skill.description; document.getElementById('skillIconSvg').value = skill.iconSvg || ''; document.getElementById('skillTagsContainer').innerHTML = '';
-      (skill.tags || []).forEach(val => addArrayItem('skillTags', val)); if (!skill.tags?.length) addArrayItem('skillTags'); showTab('skillForm');
-    }
-    function saveSkillAction(e) {
+
+    // -----------------------------------------
+    // FUNGSI SIMPAN & DELETE DATA
+    // -----------------------------------------
+    function saveProject(e) {
       e.preventDefault();
-      const skill = { id: editingSkillId || generateId(document.getElementById('skillTitle').value), title: document.getElementById('skillTitle').value, description: document.getElementById('skillDescription').value, iconSvg: document.getElementById('skillIconSvg').value, tags: getArrayValues('skillTags') };
-      window.portfolioUtils.saveSkill(skill); notify('Skill saved!', 'success'); resetSkillForm(); showTab('skillsList');
-    }
-    function deleteSkill(id) { if (confirm('Delete skill?')) { window.portfolioUtils.deleteSkill(id); notify('Skill deleted', 'success'); loadSkillsList(); } }
-    function resetSkillForm() { editingSkillId = null; document.getElementById('skillFormElement').reset(); document.getElementById('skillTagsContainer').innerHTML = ''; addArrayItem('skillTags'); }
+      const imagesArray = [];
+      const imageGroups = document.getElementById('imageFieldsContainer').children;
+      for(let i = 0; i < imageGroups.length; i++) {
+        const b64Input = imageGroups[i].querySelector('input[type="hidden"]').value;
+        if (b64Input) imagesArray.push({ src: b64Input, title: imageGroups[i].querySelector('input[type="text"]').value, description: imageGroups[i].querySelector('textarea').value });
+      }
 
-    // --- PROJECTS MANAGEMENT ---
-    function loadProjectList() {
-      if(!window.portfolioUtils) return;
-      document.getElementById('adminProjectList').innerHTML = window.portfolioUtils.getProjects().map(project => `
-        <div class="project-list-item"><div class="project-list-info"><h3>${project.title}</h3><p>${project.category} | ${project.date}</p></div><div class="project-list-actions"><button class="btn btn-secondary btn-small" onclick="editProject('${project.id}')">Edit</button><button class="btn btn-danger btn-small" onclick="deleteProject('${project.id}')">Delete</button></div></div>
-      `).join('');
+      try {
+        const projects = window.portfolioUtils.getProjects();
+        const newProj = {
+          id: editingProjectIdx > -1 ? projects[editingProjectIdx].id : Date.now().toString(), 
+          title: document.getElementById('p-title').value, 
+          category: document.getElementById('p-category').value, 
+          description: document.getElementById('p-desc').value, 
+          technologies: document.getElementById('p-tech').value.split(',').map(t => t.trim()), 
+          images: imagesArray 
+        };
+        
+        if (editingProjectIdx > -1) projects[editingProjectIdx] = newProj; // Update
+        else projects.push(newProj); // Add New
+        
+        localStorage.setItem('portfolio_projects', JSON.stringify(projects));
+        resetProjectForm(); loadAdminData(); alert(editingProjectIdx > -1 ? "Project diperbarui!" : "Project ditambahkan!");
+      } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh. Pastikan gambar sudah dikompres."); }
     }
-    function editProject(id) {
-      if(!window.portfolioUtils) return; const p = window.portfolioUtils.getProjectById(id); if (!p) return;
-      editingProjectId = id; document.getElementById('title').value = p.title; document.getElementById('category').value = p.category; document.getElementById('description').value = p.description; document.getElementById('overview').value = p.overview; document.getElementById('date').value = p.date;
-      ['technologies', 'features'].forEach(t => { document.getElementById(`${t}Container`).innerHTML = ''; (p[t] || []).forEach(v => addArrayItem(t, v)); if (!p[t]?.length) addArrayItem(t); });
-      uploadedImages = Array.isArray(p.images) ? [...p.images] : []; renderImagePreviews(); showTab('form');
-    }
-    function saveProjectAction(e) {
+
+    function saveExperience(e) {
       e.preventDefault();
-      const project = { id: editingProjectId || generateId(document.getElementById('title').value), title: document.getElementById('title').value, category: document.getElementById('category').value, description: document.getElementById('description').value, overview: document.getElementById('overview').value, date: document.getElementById('date').value, technologies: getArrayValues('technologies'), features: getArrayValues('features'), images: uploadedImages };
-      window.portfolioUtils.saveProject(project); notify('Project saved!', 'success'); resetProjectForm(); showTab('list');
+      const imagesArray = [];
+      const imageGroups = document.getElementById('imageFieldsContainerExp').children;
+      for(let i = 0; i < imageGroups.length; i++) {
+        const b64Input = imageGroups[i].querySelector('input[type="hidden"]').value;
+        if (b64Input) imagesArray.push({ src: b64Input, title: imageGroups[i].querySelector('input[type="text"]').value, description: imageGroups[i].querySelector('textarea').value });
+      }
+
+      try {
+        const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+        const experience = expFunction ? expFunction() : [];
+        const newExp = {
+          title: document.getElementById('e-title').value, 
+          company: document.getElementById('e-company').value, 
+          period: document.getElementById('e-period').value, 
+          description: document.getElementById('e-desc').value, 
+          images: imagesArray
+        };
+        
+        if (editingExpIdx > -1) experience[editingExpIdx] = newExp; // Update
+        else experience.push(newExp); // Add New
+
+        localStorage.setItem('portfolio_experience', JSON.stringify(experience));
+        resetExpForm(); loadAdminData(); alert(editingExpIdx > -1 ? "Experience diperbarui!" : "Experience ditambahkan!");
+      } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh."); }
     }
-    function deleteProject(id) { if (confirm('Delete project?')) { window.portfolioUtils.deleteProject(id); notify('Deleted', 'success'); loadProjectList(); } }
-    function resetProjectForm() { editingProjectId = null; uploadedImages = []; document.getElementById('projectForm').reset(); renderImagePreviews(); ['technologies', 'features'].forEach(t => { document.getElementById(`${t}Container`).innerHTML = ''; addArrayItem(t); }); }
 
-    // --- IMAGES ---
-    function handleFiles(files) { files.forEach(f => { if (!f.type.startsWith('image/')) return notify(`Bukan gambar!`, 'error'); if (f.size > 5 * 1024 * 1024) return notify(`Max 5MB!`, 'error'); const r = new FileReader(); r.onload = (e) => { uploadedImages.push({ url: e.target.result, caption: f.name }); renderImagePreviews(); }; r.readAsDataURL(f); }); }
-    function renderImagePreviews() { const grid = document.getElementById('imagePreviewGrid'); grid.innerHTML = ''; if (uploadedImages.length > 0) { grid.style.display = 'flex'; grid.style.gap = '10px'; grid.style.flexWrap = 'wrap'; grid.style.marginTop = '1rem'; } uploadedImages.forEach((img, i) => { const div = document.createElement('div'); div.style.position = 'relative'; div.style.width = '100px'; div.style.height = '100px'; div.style.borderRadius = '8px'; div.style.overflow = 'hidden'; div.style.border = '1px solid #444'; div.innerHTML = `<img src="${img.url}" style="width: 100%; height: 100%; object-fit: cover;"><button type="button" onclick="removeImage(${i})" style="position: absolute; top: 4px; right: 4px; background: #f85149; color: white; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer;">X</button>`; grid.appendChild(div); }); }
-    function removeImage(i) { uploadedImages.splice(i, 1); renderImagePreviews(); }
+    function saveSkill(e) {
+      e.preventDefault();
+      const skills = window.portfolioUtils.getSkills();
+      const newSkill = { 
+        title: document.getElementById('s-title').value, 
+        description: document.getElementById('s-desc').value, 
+        tags: document.getElementById('s-tags').value.split(',').map(t => t.trim()) 
+      };
+      
+      if (editingSkillIdx > -1) skills[editingSkillIdx] = newSkill; // Update
+      else skills.push(newSkill); // Add New
 
-    // --- MESSAGES VIEWER ---
-    function loadMessages() { const msgs = JSON.parse(localStorage.getItem('contactMessages') || '[]'); const cont = document.getElementById('messagesContainer'); if (msgs.length === 0) return cont.innerHTML = '<div class="no-messages"><p>No messages yet.</p></div>'; msgs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); cont.innerHTML = msgs.map((msg, idx) => `<div class="message-card"><div class="message-header"><div><div class="message-from">${escapeHtml(msg.from_name)}</div><div class="message-email">${escapeHtml(msg.from_email)}</div></div><span class="message-status ${msg.status}">${msg.status}</span></div><div class="message-content">${escapeHtml(msg.message)}</div><div class="message-actions"><a href="mailto:${escapeHtml(msg.from_email)}" class="btn btn-primary btn-small">Reply</a><button class="btn btn-danger btn-small" onclick="deleteMessage(${idx})">Delete</button></div></div>`).join(''); }
-    function deleteMessage(i) { const msgs = JSON.parse(localStorage.getItem('contactMessages') || '[]'); msgs.splice(i, 1); localStorage.setItem('contactMessages', JSON.stringify(msgs)); loadMessages(); notify('Message deleted', 'success'); }
-    function clearAllMessages() { if(confirm('Delete all messages?')) { localStorage.setItem('contactMessages', '[]'); loadMessages(); } }
-    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+      localStorage.setItem('portfolio_skills', JSON.stringify(skills));
+      resetSkillForm(); loadAdminData(); alert(editingSkillIdx > -1 ? "Skill diperbarui!" : "Skill ditambahkan!");
+    }
+
+    function deleteItem(type, index) {
+      if(confirm("Yakin ingin menghapus data ini?")) {
+        if (type === 'project') {
+          let items = window.portfolioUtils.getProjects(); items.splice(index, 1); localStorage.setItem('portfolio_projects', JSON.stringify(items));
+        } else if (type === 'skill') {
+          let items = window.portfolioUtils.getSkills(); items.splice(index, 1); localStorage.setItem('portfolio_skills', JSON.stringify(items));
+        } else if (type === 'experience') {
+          const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+          let items = expFunction(); items.splice(index, 1); localStorage.setItem('portfolio_experience', JSON.stringify(items));
+        }
+        loadAdminData(); 
+      }
+    }
+
+    // -----------------------------------------
+    // FUNGSI GAMBAR (DENGAN DUKUNGAN EDIT)
+    // -----------------------------------------
+    function addImageField(containerId, prefix, existingImg = null) {
+      const container = document.getElementById(containerId);
+      const id = imageFieldCount++;
+      const div = document.createElement('div');
+      div.className = 'image-group';
+
+      let b64Val = existingImg ? existingImg.src : '';
+      let titleVal = existingImg ? (existingImg.title || '') : '';
+      let descVal = existingImg ? (existingImg.description || '') : '';
+      let previewHtml = b64Val ? `<img src="${b64Val}" style="max-height: 120px; display: block; margin-bottom: 10px; border-radius: 6px; border: 1px solid #30363d;">` : '';
+
+      div.innerHTML = `
+        ${previewHtml}
+        <label style="color: #8b949e; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">${existingImg ? 'Ganti Gambar (Biarkan kosong jika tetap memakai foto di atas)' : 'Pilih File Gambar'}</label>
+        <input type="file" accept="image/*" class="admin-input" style="padding: 0.5rem;" onchange="convertToBase64(this, '${prefix}', ${id})">
+        <input type="hidden" id="${prefix}-img-b64-${id}" value="${b64Val}">
+        
+        <input type="text" id="${prefix}-img-title-${id}" class="admin-input" placeholder="Photo Title" value="${titleVal}">
+        <textarea id="${prefix}-img-desc-${id}" class="admin-input" placeholder="Photo Description" rows="2">${descVal}</textarea>
+        
+        <button type="button" class="admin-btn-danger" style="width: 100%; margin-top: 0.5rem;" onclick="this.parentElement.remove()">Hapus Foto Ini</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function convertToBase64(fileInput, prefix, id) {
+      const file = fileInput.files[0];
+      if (file) {
+        if(file.size > 500000) alert("PERINGATAN: Ukuran file sangat besar! Harap kompres terlebih dahulu agar memori tidak error.");
+        const reader = new FileReader();
+        reader.onload = function(e) { document.getElementById(`${prefix}-img-b64-${id}`).value = e.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
   </script>
 </body>
 </html>
