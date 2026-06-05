@@ -22,14 +22,15 @@
     </div>
   </nav>
 
-  <section class="page-hero" style="padding-bottom: 2rem;">
-    <div class="hero-bg"><div class="circuit-grid"></div><div class="glow-orb glow-orb-1"></div></div>
+  <section style="padding-top: 2rem; padding-bottom: 1rem;">
     <div class="container">
-      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #58a6ff; text-decoration: none; margin-bottom: 2rem; font-weight: 500;">
+      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #58a6ff; text-decoration: none; margin-bottom: 1rem; font-size: 0.95rem;">
         ← Back to Home
       </a>
-      <h1 class="page-title" style="font-size: 2.5rem; color: #c9d1d9;">My Experience</h1>
-      <p class="page-description" style="color: #8b949e; max-width: 600px; margin-top: 1rem;">A journey of continuous learning, professional growth, and hands-on engineering.</p>
+      <div style="margin-top: 0.5rem;">
+        <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">My Experience</h1>
+        <p style="color: #8b949e; max-width: 600px; margin-top: 0.5rem; font-size: 0.95rem;">A journey of continuous learning, professional growth, and hands-on engineering.</p>
+      </div>
     </div>
   </section>
 
@@ -51,7 +52,6 @@
       }
 
       container.innerHTML = experiences.map((exp, index) => {
-        // Cuplikan teks agar tidak terlalu panjang di halaman utama
         let shortDesc = exp.description || "";
         if (shortDesc.length > 120) shortDesc = shortDesc.substring(0, 120) + "...";
 
