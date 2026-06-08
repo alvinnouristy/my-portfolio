@@ -40,13 +40,25 @@
       }
 
       // ==========================================
-      // LOGIKA PEMUTAR VIDEO (YOUTUBE / MP4)
+      // LOGIKA FORMAT PARAGRAF DENGAN EFEK TAB (INDENT)
+      // ==========================================
+      let formattedDesc = '';
+      if (project.description) {
+        // Menambahkan text-indent: 2rem agar teks awal paragraf menjorok ke dalam
+        formattedDesc = project.description
+          .split('\n')
+          .filter(para => para.trim() !== '')
+          .map(para => `<p style="color: #8b949e; line-height: 1.8; text-align: justify; margin-bottom: 1.2rem; text-indent: 2rem;">${para.trim()}</p>`)
+          .join('');
+      }
+
+      // ==========================================
+      // LOGIKA PEMUTAR VIDEO (YOUTUBE)
       // ==========================================
       let videoHtml = '';
       if (project.video) {
         let embedUrl = project.video;
         
-        // Cek jika ini link YouTube biasa, ubah otomatis jadi link Embed
         if (embedUrl.includes('youtube.com/watch?v=')) {
           let videoId = embedUrl.split('v=')[1];
           const ampersandPosition = videoId.indexOf('&');
@@ -59,11 +71,10 @@
           embedUrl = `https://www.youtube.com/embed/${videoId}`;
         }
 
-        // Tampilkan sebagai iframe Video YouTube yang Responsive
         videoHtml = `
-          <div style="margin-top: 3rem; margin-bottom: 2rem;">
-            <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Video Demonstrasi</h3>
-            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid #30363d; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          <div style="margin-top: 2rem; margin-bottom: 1rem;">
+            <h4 style="color: #c9d1d9; font-size: 1.1rem; margin-bottom: 0.8rem;">Video Demonstrasi:</h4>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
               <iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
             </div>
           </div>
@@ -76,7 +87,7 @@
       let galleryHtml = '';
       if (project.images && project.images.length > 0) {
         galleryHtml = `
-          <div style="margin-top: 4rem;">
+          <div style="margin-top: 1rem;">
             <h3 style="color: #c9d1d9; font-size: 1.8rem; margin-bottom: 1.5rem; text-align: center;">Dokumentasi</h3>
             <div style="display: flex; flex-direction: column; gap: 3rem;">
               ${project.images.map(img => `
@@ -84,7 +95,7 @@
                   <img src="${img.src}" alt="${img.title}" style="width: 100%; max-height: 500px; object-fit: contain; background: #000;">
                   <div style="padding: 1.5rem;">
                     <h4 style="color: #58a6ff; font-size: 1.25rem; margin-bottom: 0.5rem;">${img.title}</h4>
-                    <p style="color: #8b949e; line-height: 1.6;">${img.description}</p>
+                    <p style="color: #8b949e; line-height: 1.6; text-align: justify; text-indent: 2rem;">${img.description}</p>
                   </div>
                 </div>
               `).join('')}
@@ -93,6 +104,9 @@
         `;
       }
 
+      // ==========================================
+      // MENYUSUN TAMPILAN HALAMAN
+      // ==========================================
       contentArea.innerHTML = `
         <section style="padding-top: 0.5rem; padding-bottom: 1rem;">
           <div class="container">
@@ -109,13 +123,17 @@
         <section class="project-details" style="padding-top: 1.5rem;">
           <div class="container" style="max-width: 800px; margin: 0 auto;">
             
-            ${videoHtml}
-
-            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 2rem;">
-              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Overview</h3>
-              <p style="color: #8b949e; line-height: 1.8; margin-bottom: 2rem;">${project.description}</p>
+            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
               
-              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Technologies Used</h3>
+              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1.5rem;">Overview</h3>
+              
+              <div style="margin-bottom: 1rem;">
+                ${formattedDesc}
+              </div>
+              
+              ${videoHtml}
+              
+              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem; margin-top: 2.5rem;">Technologies Used</h3>
               <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
                 ${(project.technologies || []).map(tech => `<span style="background: #21262d; color: #c9d1d9; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.85rem; border: 1px solid #30363d;">${tech}</span>`).join('')}
               </div>
