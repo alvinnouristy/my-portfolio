@@ -12,7 +12,7 @@
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <a href="index.html" class="nav-logo" style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">Portfolio</a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html" class="nav-link">Home</a></li>
         <li><a href="experience.html" class="nav-link active">Experience</a></li>
         <li><a href="projects.html" class="nav-link">Projects</a></li>
@@ -21,35 +21,52 @@
     </div>
   </nav>
 
-  <main id="expDetailContent" style="min-height: 70vh; padding-top: 75px; padding-bottom: 5rem;"></main>
+  <main id="experienceDetailContent" style="min-height: 70vh; padding-top: 75px; padding-bottom: 5rem;"></main>
 
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const contentArea = document.getElementById('expDetailContent');
+      const contentArea = document.getElementById('experienceDetailContent');
       const urlParams = new URLSearchParams(window.location.search);
-      const expId = urlParams.get('id');
-
-      const experiences = window.portfolioUtils.getExperiences ? window.portfolioUtils.getExperiences() : window.portfolioUtils.getExperience();
-      const exp = experiences[expId];
+      const expIndex = parseInt(urlParams.get('id'), 10);
+      
+      if (!window.portfolioUtils) return;
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+      const experiences = expFunction ? expFunction() : [];
+      const exp = experiences[expIndex];
 
       if (!exp) {
         contentArea.innerHTML = '<div class="container" style="text-align:center; padding:5rem;"><h2 style="color:#c9d1d9;">Experience Not Found</h2><a href="experience.html" style="color:#58a6ff;">Back to Experience</a></div>';
         return;
       }
 
+      // ===================================================
+      // LOGIKA FORMAT PARAGRAF DENGAN EFEK TAB & JUSTIFY
+      // ===================================================
+      let formattedDesc = '';
+      if (exp.description) {
+        formattedDesc = exp.description
+          .split('\n')
+          .filter(para => para.trim() !== '')
+          .map(para => `<p style="color: #8b949e; line-height: 1.8; text-align: justify; margin-bottom: 1.2rem; text-indent: 2rem;">${para.trim()}</p>`)
+          .join('');
+      }
+
+      // ===================================================
+      // LOGIKA GALERI FOTO DOKUMENTASI EXPERIENCE
+      // ===================================================
       let galleryHtml = '';
       if (exp.images && exp.images.length > 0) {
         galleryHtml = `
-          <div style="margin-top: 4rem;">
-            <h3 style="color: #c9d1d9; font-size: 1.8rem; margin-bottom: 1.5rem; text-align: center;">Dokumentasi</h3>
+          <div style="margin-top: 3rem;">
+            <h3 style="color: #c9d1d9; font-size: 1.8rem; margin-bottom: 1.5rem; text-align: center;">Dokumentasi Kegiatan</h3>
             <div style="display: flex; flex-direction: column; gap: 3rem;">
               ${exp.images.map(img => `
                 <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                   <img src="${img.src}" alt="${img.title}" style="width: 100%; max-height: 500px; object-fit: contain; background: #000;">
                   <div style="padding: 1.5rem;">
-                    ${img.title ? `<h4 style="color: #58a6ff; font-size: 1.25rem; margin-bottom: 0.5rem;">${img.title}</h4>` : ''}
-                    ${img.description ? `<p style="color: #8b949e; line-height: 1.6;">${img.description}</p>` : ''}
+                    <h4 style="color: #58a6ff; font-size: 1.25rem; margin-bottom: 0.5rem;">${img.title}</h4>
+                    <p style="color: #8b949e; line-height: 1.6; text-align: justify; text-indent: 2rem;">${img.description}</p>
                   </div>
                 </div>
               `).join('')}
@@ -58,6 +75,7 @@
         `;
       }
 
+      // Menyusun tampilan komponen detail
       contentArea.innerHTML = `
         <section style="padding-top: 0.5rem; padding-bottom: 1rem;">
           <div class="container">
@@ -65,20 +83,25 @@
               ← Back to Experience
             </a>
             <div style="margin-top: 0.5rem;">
-              <span style="color: #58a6ff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem;">${exp.period}</span>
-              <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">${exp.role || exp.title}</h1>
-              <h2 style="font-size: 1.2rem; color: #8b949e; margin-top: 0.5rem; font-weight: 400;">${exp.company}</h2>
+              <span style="color: #58a6ff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem;">${exp.company || 'Company'}</span>
+              <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">${exp.title || exp.role}</h1>
+              <p style="color: #8b949e; font-size: 0.95rem; margin-top: 0.2rem;">${exp.period || ''}</p>
             </div>
           </div>
         </section>
 
-        <section class="project-details" style="padding-top: 1.5rem;">
+        <section class="experience-details" style="padding-top: 1.5rem;">
           <div class="container" style="max-width: 800px; margin: 0 auto;">
-            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 2rem;">
-              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1rem;">Job Description</h3>
-              <p style="color: #8b949e; line-height: 1.8;">${exp.description}</p>
+            
+            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
+              <h3 style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 1.5rem;">Deskripsi Pengalaman</h3>
+              <div style="margin-bottom: 0;">
+                ${formattedDesc}
+              </div>
             </div>
+            
             ${galleryHtml}
+            
           </div>
         </section>
       `;

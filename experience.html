@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Professional and Organizational Experience">
   <meta name="theme-color" content="#0D1117">
   <title>Experience | Portfolio</title>
   <link rel="stylesheet" href="styles.css">
@@ -28,52 +29,82 @@
         ← Back to Home
       </a>
       <div style="margin-top: 0.5rem;">
-        <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">My Experience</h1>
-        <p style="color: #8b949e; max-width: 600px; margin-top: 0.5rem; font-size: 0.95rem;">A journey of continuous learning, professional growth, and hands-on engineering.</p>
+        <h1 style="font-size: 2.2rem; color: #c9d1d9; margin-top: 0.3rem;">Experience</h1>
+        <p style="color: #8b949e; max-width: 600px; margin-top: 0.5rem; font-size: 0.95rem;">Perjalanan karir, magang, serta pengalaman organisasi profesional saya.</p>
       </div>
     </div>
   </section>
 
-  <section style="padding: 2rem 0 5rem 0; min-height: 40vh;">
-    <div class="container" id="experienceContainer" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;"></div>
+  <section class="experience-section" style="min-height: 50vh;">
+    <div class="container">
+      <div class="timeline" id="experienceTimeline" style="display: flex; flex-direction: column; gap: 2rem;">
+        </div>
+    </div>
   </section>
 
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('experienceContainer');
+      const timeline = document.getElementById('experienceTimeline');
       if (!window.portfolioUtils) return;
-
-      const experiences = window.portfolioUtils.getExperiences ? window.portfolioUtils.getExperiences() : (window.portfolioUtils.getExperience ? window.portfolioUtils.getExperience() : []);
-
+      
+      const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience;
+      let experiences = expFunction ? expFunction() : [];
+      
       if (experiences.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 4rem; color: #8b949e; background: #161b22; border: 1px solid #30363d; border-radius: 12px;"><h2>No experience added yet.</h2></div>';
+        timeline.innerHTML = '<div style="text-align: center; padding: 3rem; color: #8b949e; background: #161b22; border-radius: 12px; border: 1px solid #30363d;"><h2>Belum ada riwayat pengalaman.</h2></div>';
         return;
       }
 
-      container.innerHTML = experiences.map((exp, index) => {
-        let shortDesc = exp.description || "";
-        if (shortDesc.length > 120) shortDesc = shortDesc.substring(0, 120) + "...";
+      // ========================================================
+      // LOGIKA AUTOMATIC SORTING (URUTAN TANGGAL TERBARU DI ATAS)
+      // ========================================================
+      function parseLatestYear(periodStr) {
+        if (!periodStr) return 0;
+        const text = periodStr.toLowerCase();
+        
+        if (text.includes('present') || text.includes('saat ini') || text.includes('sekarang')) {
+          return 9999; 
+        }
+        
+        const years = periodStr.match(/\d{4}/g);
+        if (years) {
+          return Math.max(...years.map(Number));
+        }
+        return 0;
+      }
 
+      // KUNCI INDEX ASLI: Menambahkan originalIndex sebelum data diurutkan 
+      // agar link detail mengarah ke item yang benar di Local Storage
+      const experiencesWithIndex = experiences.map((exp, originalIndex) => ({
+        ...exp,
+        originalIndex
+      }));
+
+      // Melakukan pengurutan secara otomatis berdasarkan tahun terbaru
+      experiencesWithIndex.sort((a, b) => parseLatestYear(b.period) - parseLatestYear(a.period));
+
+      // Menampilkan data ke dalam timeline list
+      timeline.innerHTML = experiencesWithIndex.map((exp) => {
         return `
-        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2rem; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
-          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #58a6ff;"></div>
-          
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h3 style="color: #c9d1d9; font-size: 1.4rem; margin-bottom: 0.3rem;">${exp.role || exp.title}</h3>
-              <h4 style="color: #58a6ff; font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;">${exp.company}</h4>
-              <div style="display: inline-block; background: #21262d; color: #8b949e; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; border: 1px solid #30363d; margin-bottom: 1.2rem;">
-                ${exp.period}
-              </div>
+              <span style="color: #58a6ff; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">${exp.company || 'Company'}</span>
+              <h3 style="color: #c9d1d9; font-size: 1.4rem; margin: 0.2rem 0;">${exp.title || exp.role}</h3>
             </div>
-            
-            <a href="experience-detail.html?id=${index}" style="display: inline-block; padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 500; color: #c9d1d9; background: #21262d; border: 1px solid #30363d; border-radius: 6px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#58a6ff'; this.style.color='#58a6ff';" onmouseout="this.style.borderColor='#30363d'; this.style.color='#c9d1d9';">
-              Details →
+            <span style="background: #21262d; color: #8b949e; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; border: 1px solid #30363d; font-weight: 500;">
+              ${exp.period || ''}
+            </span>
+          </div>
+          <p style="color: #8b949e; line-height: 1.6; margin: 0.5rem 0; text-align: justify;">
+            ${exp.description ? (exp.description.length > 130 ? exp.description.substring(0, 130) + '...' : exp.description) : ''}
+          </p>
+          <div style="margin-top: 0.5rem;">
+            <a href="experience-detail.html?id=${exp.originalIndex}" style="display: inline-block; background: #238636; color: white; padding: 0.5rem 1.2rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s;">
+              View Details
             </a>
           </div>
-          
-          <p style="color: #8b949e; line-height: 1.6; margin-bottom: 0; font-size: 0.95rem;">${shortDesc}</p>
         </div>
         `;
       }).join('');
