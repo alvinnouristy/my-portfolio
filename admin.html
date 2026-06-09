@@ -223,11 +223,12 @@
     }
 
     function deleteItem(type, index) {
-      if(confirm("Yakin ingin menghapus data ini?")) {
+      if(confirm("Yakin ingin menghapus data ini? (Perubahan akan langsung sinkron ke Firebase Cloud)")) {
         if (type === 'project') { let items = window.portfolioUtils.getProjects(); items.splice(index, 1); localStorage.setItem('portfolio_projects', JSON.stringify(items)); } 
         else if (type === 'skill') { let items = window.portfolioUtils.getSkills(); items.splice(index, 1); localStorage.setItem('portfolio_skills', JSON.stringify(items)); } 
         else if (type === 'experience') { const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience; let items = expFunction(); items.splice(index, 1); localStorage.setItem('portfolio_experience', JSON.stringify(items)); }
         loadAdminData(); 
+        alert("🗑️ Data dihapus dan sedang diperbarui di Firebase Cloud! ☁️");
       }
     }
 
@@ -238,7 +239,6 @@
       document.getElementById('p-desc').value = p.description; 
       document.getElementById('p-tech').value = (p.technologies || []).join(', ');
       
-      // Load Data Video Ke Dalam Form Jika Ada
       document.getElementById('p-video').value = p.video || ''; 
       
       document.getElementById('imageFieldsContainer').innerHTML = '';
@@ -289,12 +289,19 @@
           category: document.getElementById('p-category').value, 
           description: document.getElementById('p-desc').value, 
           technologies: document.getElementById('p-tech').value.split(',').map(t => t.trim()), 
-          video: document.getElementById('p-video').value.trim(), // SIMPAN LINK VIDEO
+          video: document.getElementById('p-video').value.trim(), 
           images: imagesArray 
         };
         if (editingProjectIdx > -1) projects[editingProjectIdx] = newProj; else projects.push(newProj);
+        
+        // Simpan ke local, JS main.js akan menyedotnya ke Firebase
         localStorage.setItem('portfolio_projects', JSON.stringify(projects));
-        resetProjectForm(); loadAdminData(); alert(editingProjectIdx > -1 ? "Project diperbarui!" : "Project ditambahkan!");
+        
+        resetProjectForm(); 
+        loadAdminData(); 
+        
+        // Notifikasi sudah diganti agar menampilkan kata Firebase
+        alert(editingProjectIdx > -1 ? "✅ Project diperbarui dan sedang diunggah ke Firebase Cloud! ☁️" : "✅ Project ditambahkan dan sedang diunggah ke Firebase Cloud! ☁️");
       } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh."); }
     }
 
@@ -309,8 +316,13 @@
         const expFunction = window.portfolioUtils.getExperiences || window.portfolioUtils.getExperience; const experience = expFunction ? expFunction() : [];
         const newExp = { title: document.getElementById('e-title').value, company: document.getElementById('e-company').value, period: document.getElementById('e-period').value, description: document.getElementById('e-desc').value, images: imagesArray };
         if (editingExpIdx > -1) experience[editingExpIdx] = newExp; else experience.push(newExp);
+        
         localStorage.setItem('portfolio_experience', JSON.stringify(experience));
-        resetExpForm(); loadAdminData(); alert(editingExpIdx > -1 ? "Experience diperbarui!" : "Experience ditambahkan!");
+        
+        resetExpForm(); 
+        loadAdminData(); 
+        
+        alert(editingExpIdx > -1 ? "✅ Experience diperbarui dan sedang diunggah ke Firebase Cloud! ☁️" : "✅ Experience ditambahkan dan sedang diunggah ke Firebase Cloud! ☁️");
       } catch (error) { alert("GAGAL MENYIMPAN! Memori browser penuh."); }
     }
 
@@ -319,8 +331,13 @@
       const skills = window.portfolioUtils.getSkills();
       const newSkill = { id: editingSkillIdx > -1 ? skills[editingSkillIdx].id : Date.now().toString(), title: document.getElementById('s-title').value, description: document.getElementById('s-desc').value, tags: document.getElementById('s-tags').value.split(',').map(t => t.trim()) };
       if (editingSkillIdx > -1) skills[editingSkillIdx] = newSkill; else skills.push(newSkill);
+      
       localStorage.setItem('portfolio_skills', JSON.stringify(skills));
-      resetSkillForm(); loadAdminData(); alert(editingSkillIdx > -1 ? "Skill diperbarui!" : "Skill ditambahkan!");
+      
+      resetSkillForm(); 
+      loadAdminData(); 
+      
+      alert(editingSkillIdx > -1 ? "✅ Skill diperbarui dan sedang diunggah ke Firebase Cloud! ☁️" : "✅ Skill ditambahkan dan sedang diunggah ke Firebase Cloud! ☁️");
     }
 
     function addImageField(containerId, prefix, existingImg = null) {
