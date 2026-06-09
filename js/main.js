@@ -1,6 +1,85 @@
-// ==========================================
-// KONFIGURASI TELEGRAM BOT
-// ==========================================
+(async function initFirebase() {
+    // Fungsi untuk memuat script Firebase secara otomatis
+    function loadScript(src) {
+        return new Promise(resolve => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            document.head.appendChild(script);
+        });
+    }
+
+    await loadScript("https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js");
+    await loadScript("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js");
+
+    firebase.initializeApp({
+        apiKey: "AIzaSyCubmwz2r7m1F40f3gUi7_euMDDvy5iC3M",
+        authDomain: "my-portfolio-alvin-nouristy.firebaseapp.com",
+        projectId: "my-portfolio-alvin-nouristy",
+        storageBucket: "my-portfolio-alvin-nouristy.firebasestorage.app",
+        messagingSenderId: "368363281531",
+        appId: "1:368363281531:web:1d40db39fc7db2e34f16de"
+    });
+    window.db = firebase.firestore();
+
+    const originalSetItem = localStorage.setItem;
+
+    window.syncLokalKeFirebase = async function() {
+        if (!window.db) return;
+        try {
+            const data = {
+                projects: JSON.parse(localStorage.getItem('portfolio_projects') || '[]'),
+                experiences: JSON.parse(localStorage.getItem('portfolio_experience') || '[]'),
+                skills: JSON.parse(localStorage.getItem('portfolio_skills') || '[]')
+            };
+            await window.db.collection('portfolio').doc('data').set(data);
+            console.log("☁️ Berhasil tersimpan di Database Cloud!");
+        } catch (error) {
+            console.error("Gagal menyimpan ke Cloud:", error);
+        }
+    };
+
+    // 4. INTERCEPTOR AJAIB: Otomatis upload setiap kali Admin klik tombol Save
+    localStorage.setItem = function(key, value) {
+        originalSetItem.apply(this, arguments); // Simpan lokal seperti biasa
+        if (key === 'portfolio_projects' || key === 'portfolio_experience' || key === 'portfolio_skills') {
+            window.syncLokalKeFirebase(); // Langsung lempar ke Cloud!
+        }
+    };
+
+    // 5. DOWNLOAD DATA: Untuk publik yang membuka website Anda
+    try {
+        const docRef = window.db.collection('portfolio').doc('data');
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            const serverProj = JSON.stringify(data.projects || []);
+            const serverExp = JSON.stringify(data.experiences || []);
+            const serverSkill = JSON.stringify(data.skills || []);
+
+            const localProj = localStorage.getItem('portfolio_projects') || "[]";
+            const localExp = localStorage.getItem('portfolio_experience') || "[]";
+            const localSkill = localStorage.getItem('portfolio_skills') || "[]";
+
+            // Jika publik membuka web dan datanya kosong/lama, update dari cloud & refresh layar
+            if (localProj !== serverProj || localExp !== serverExp || localSkill !== serverSkill) {
+                originalSetItem.call(localStorage, 'portfolio_projects', serverProj);
+                originalSetItem.call(localStorage, 'portfolio_experience', serverExp);
+                originalSetItem.call(localStorage, 'portfolio_skills', serverSkill);
+                
+                // Refresh halaman 1x agar data baru langsung tampil ke pengunjung
+                location.reload(); 
+            }
+        } else {
+            // Jika database cloud masih kosong (baru pertama buat), dorong data lokal admin ke cloud
+            window.syncLokalKeFirebase();
+        }
+    } catch (error) {
+        console.error("Gagal mengambil data dari Cloud:", error);
+    }
+})();
+
 const TELEGRAM_BOT_TOKEN = '8964310319:AAFLdHA66XGIBvVEwxxIdTx8H17pph0sk8M'; 
 const TELEGRAM_CHAT_ID = '1838902666'; 
 
