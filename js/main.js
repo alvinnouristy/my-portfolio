@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (response.ok) {
-          alert('Pesan berhasil terkirim ke Telegram!');
+          alert('Message Sent Successfully!');
           contactForm.reset();
           isCooldown = true;
           let timeLeft = 10;
@@ -257,12 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }, 1000);
         } else {
-          alert('Gagal mengirim ke Telegram. Server error.');
+          alert('Message failed to send. Server error.');
           submitBtn.disabled = false;
           btnText.textContent = originalText;
         }
       } catch (error) {
-        alert('Gagal mengirim pesan, cek koneksi internet.');
+        alert('Failed to send message, please check your internet connection.');
         submitBtn.disabled = false;
         btnText.textContent = originalText;
       }
