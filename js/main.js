@@ -11,11 +11,11 @@
       });
   }
 
-  // 1. Download SDK Firebase
+  // 1. Download SDK Firebase ke Website
   await loadScript("https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js");
   await loadScript("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js");
 
-  // 2. Inisialisasi Kunci Firebase Anda
+  // 2. Inisialisasi Kunci Firebase
   firebase.initializeApp({
       apiKey: "AIzaSyCubmwz2r7m1F40f3gUi7_euMDDvy5iC3M",
       authDomain: "my-portfolio-alvin-nouristy.firebaseapp.com",
@@ -28,7 +28,7 @@
 
   const originalSetItem = localStorage.setItem;
 
-  // 3. Fungsi Sinkronisasi: Lokal ke Cloud
+  // 3. Fungsi Sinkronisasi: Kirim data dari Admin ke Cloud Firebase
   window.syncLokalKeFirebase = async function() {
       if (!window.db) return;
       try {
@@ -38,17 +38,20 @@
               skills: JSON.parse(localStorage.getItem('portfolio_skills') || '[]')
           };
           await window.db.collection('portfolio').doc('data').set(data);
-          console.log("☁️ Berhasil tersimpan di Database Cloud!");
+          console.log("☁️ Data Berhasil Amandemen ke Database Cloud!");
       } catch (error) {
           console.error("Gagal menyimpan ke Cloud:", error);
       }
   };
 
-  // 4. Interceptor: Otomatis upload saat Admin menekan tombol "Save"
+  // 4. Interceptor: Otomatis upload data jika ada perubahan
   localStorage.setItem = function(key, value) {
       originalSetItem.apply(this, arguments); 
       if (key === 'portfolio_projects' || key === 'portfolio_experience' || key === 'portfolio_skills') {
-          window.syncLokalKeFirebase(); 
+          // KUNCI PENGAMAN: Hanya izinkan upload ke cloud jika berada di halaman admin!
+          if (window.location.href.includes('admin.html')) {
+              window.syncLokalKeFirebase(); 
+          }
       }
   };
 
@@ -59,25 +62,33 @@
 
       if (docSnap.exists) {
           const data = docSnap.data();
+          
+          // Standardisasi format string data server
           const serverProj = JSON.stringify(data.projects || []);
           const serverExp = JSON.stringify(data.experiences || []);
           const serverSkill = JSON.stringify(data.skills || []);
 
-          const localProj = localStorage.getItem('portfolio_projects') || "[]";
-          const localExp = localStorage.getItem('portfolio_experience') || "[]";
-          const localSkill = localStorage.getItem('portfolio_skills') || "[]";
+          // Standardisasi format string data lokal browser
+          const localProj = JSON.stringify(JSON.parse(localStorage.getItem('portfolio_projects') || '[]'));
+          const localExp = JSON.stringify(JSON.parse(localStorage.getItem('portfolio_experience') || '[]'));
+          const localSkill = JSON.stringify(JSON.parse(localStorage.getItem('portfolio_skills') || '[]'));
 
-          // Jika data di browser publik usang, perbarui dari cloud lalu refresh layar
+          // Jika data publik kosong atau berbeda dengan cloud, paksa update dari cloud
           if (localProj !== serverProj || localExp !== serverExp || localSkill !== serverSkill) {
               originalSetItem.call(localStorage, 'portfolio_projects', serverProj);
               originalSetItem.call(localStorage, 'portfolio_experience', serverExp);
               originalSetItem.call(localStorage, 'portfolio_skills', serverSkill);
               
-              location.reload(); 
+              // Refresh halaman 1x agar data dari cloud langsung merendering sempurna ke publik
+              if (!window.location.href.includes('admin.html')) {
+                  location.reload(); 
+              }
           }
       } else {
-          // Jika cloud kosong, isi dengan data default admin
-          window.syncLokalKeFirebase();
+          // Jika database cloud benar-benar kosong, inisialisasi hanya via halaman admin
+          if (window.location.href.includes('admin.html')) {
+              window.syncLokalKeFirebase();
+          }
       }
   } catch (error) {
       console.error("Gagal mengambil data dari Cloud:", error);
