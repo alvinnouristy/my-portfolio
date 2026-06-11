@@ -27,7 +27,9 @@
   window.db = firebase.firestore();
 
   const originalSetItem = localStorage.setItem;
-  const isAdminPage = window.location.href.includes('admin');
+  
+  // CEK ADMIN: Apakah URL mengandung kata 'admin' atau sandi admin '9f8e7d6c5b4a3f2e'
+  const isAdminPage = window.location.href.includes('admin') || window.location.href.includes('9f8e7d6c5b4a3f2e');
 
   // 3. ENGINE UPLOAD: Tarik data lokal dan Tembak ke Firebase
   window.syncLokalKeFirebase = async function() {
@@ -117,7 +119,7 @@ function renderProjectsDirectly(projectsArray) {
         ${(project.technologies || []).map(tech => `<span style="background: #21262d; color: #c9d1d9; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; border: 1px solid #30363d;">${tech}</span>`).join('')}
       </div>
       <div class="project-footer" style="margin-top: auto;">
-        <a href="project-detail.html?id=${project.id}" class="btn btn-primary" style="display: inline-block; width: 100%; text-align: center; background: #238636; color: white; padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">View Details</a>
+        <a href="/3b2a1f0e9d8c7b6a?id=${project.id}" class="btn btn-primary" style="display: inline-block; width: 100%; text-align: center; background: #238636; color: white; padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">View Details</a>
       </div>
     </div>`;
   }).join('');
@@ -150,7 +152,7 @@ function renderExperiencesDirectly(experiencesArray) {
         ${exp.description ? (exp.description.length > 130 ? exp.description.substring(0, 130) + '...' : exp.description) : ''}
       </p>
       <div style="margin-top: 0.5rem;">
-        <a href="experience-detail.html?id=${exp.originalIndex}" style="display: inline-block; background: #238636; color: white; padding: 0.5rem 1.2rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600;">View Details</a>
+        <a href="/5e4d3c2b1a0f9e8d?id=${exp.originalIndex}" style="display: inline-block; background: #238636; color: white; padding: 0.5rem 1.2rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600;">View Details</a>
       </div>
     </div>`;
   }).join('');
@@ -218,7 +220,6 @@ function showFormNotification(message, type = 'success') {
 
   document.body.appendChild(toast);
 
-  // Auto hapus setelah 6 detik jika pengguna lupa menekan tombol X
   setTimeout(() => {
     if (document.body.contains(toast)) {
         toast.style.opacity = '0';
@@ -271,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const originalText = btnText.textContent;
       
       submitBtn.disabled = true;
-      btnText.textContent = 'Sending...'; // Diubah ke bahasa Inggris
+      btnText.textContent = 'Sending...';
 
       const formData = new FormData(contactForm);
       const data = {
@@ -292,15 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (response.ok) {
-          // Tampilkan Kotak Hijau Sukses tanpa kata Telegram
           showFormNotification('Message sent successfully!', 'success');
           contactForm.reset();
           isCooldown = true;
           let timeLeft = 10;
           
-          // Timer 10 detik tetap berjalan di tombol Submit
           const countdownInterval = setInterval(() => {
-            btnText.textContent = `Wait ${timeLeft}s...`; // Teks Timer bahasa Inggris
+            btnText.textContent = `Wait ${timeLeft}s...`; 
             timeLeft--;
             if (timeLeft < 0) {
               clearInterval(countdownInterval);
@@ -326,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = prompt("Admin Access Required.\nMasukkan Username:");
     if (username === "admin") {
       const password = prompt("Masukkan Password:");
-      if (password === "trisyanto") window.location.href = 'admin.html';
+      if (password === "trisyanto") window.location.href = '/9f8e7d6c5b4a3f2e'; // Mengarah ke link admin rahasia
       else alert("Akses Ditolak!");
     }
   }
@@ -353,3 +352,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+const isHalamanAdmin = window.location.href.includes('admin') || window.location.href.includes('9f8e7d6c5b4a3f2e');
+if (!isHalamanAdmin) {
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') e.preventDefault();
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+      e.preventDefault();
+    }
+  });
+}

@@ -5,6 +5,37 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/1a2b3c4d5e6f7a8b",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/9f8e7d6c5b4a3f2e",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/77c96b6e44940ea7",
+        "destination": "/experience.html"
+      },
+      {
+        "source": "/88d1a2b3c4d5e6f7",
+        "destination": "/projects.html"
+      },
+      {
+        "source": "/5e4d3c2b1a0f9e8d",
+        "destination": "/experience-detail.html"
+      },
+      {
+        "source": "/3b2a1f0e9d8c7b6a",
+        "destination": "/project-detail.html"
+      },
+      {
+        "source": "/4c3b2a1f0e9d8c7b",
+        "destination": "/contact.html"
+      }
     ]
   }
 }
