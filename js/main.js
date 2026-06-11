@@ -28,10 +28,10 @@
 
   const originalSetItem = localStorage.setItem;
   
-  // CEK ADMIN: Apakah URL mengandung kata 'admin' atau sandi admin '9f8e7d6c5b4a3f2e'
+  // CEK ADMIN: Apakah URL mengandung kata 'admin' atau sandi admin
   const isAdminPage = window.location.href.includes('admin') || window.location.href.includes('9f8e7d6c5b4a3f2e');
 
-  // 3. ENGINE UPLOAD: Tarik data lokal dan Tembak ke Firebase
+  // 3. ENGINE UPLOAD
   window.syncLokalKeFirebase = async function() {
       if (!window.db) return;
       try {
@@ -55,7 +55,7 @@
       }
   };
 
-  // 4. AUTOPILOT SENSOR: Deteksi tombol Save Admin
+  // 4. AUTOPILOT SENSOR
   let syncTimer;
   localStorage.setItem = function(key, value) {
       originalSetItem.apply(this, arguments); 
@@ -68,7 +68,7 @@
       }
   };
 
-  // 5. AUTO-DOWNLOAD: Tarik Data Cloud untuk Publik (TANPA RELOAD)
+  // 5. AUTO-DOWNLOAD
   try {
       const docRef = window.db.collection('portfolio').doc('data');
       const docSnap = await docRef.get();
@@ -94,6 +94,54 @@
       console.error("Gagal mengambil data dari Cloud:", error);
   }
 })();
+
+// ==========================================
+// AUTO-TRANSLATE LINK SANDI RAHASIA
+// (Ini yang membuat navigasi Home, Contact, dll bekerja otomatis!)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const kamusSandi = {
+    'index.html': '/',
+    'admin.html': '/9f8e7d6c5b4a3f2e',
+    'experience.html': '/77c96b6e44940ea7',
+    'projects.html': '/88d1a2b3c4d5e6f7',
+    'experience-detail.html': '/5e4d3c2b1a0f9e8d',
+    'project-detail.html': '/3b2a1f0e9d8c7b6a'
+  };
+
+  document.querySelectorAll('a').forEach(link => {
+    let href = link.getAttribute('href');
+    if (!href) return;
+    
+    // --- PERBAIKAN KHUSUS UNTUK MENU CONTACT ---
+    // Jika pengunjung klik Contact tapi tidak berada di Home, arahkan kembali ke Home
+    if (href === '#contact') {
+      if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+        link.setAttribute('href', '/#contact');
+      }
+      return; 
+    }
+
+    // --- TRANSLATE FILE HTML KE SANDI ---
+    let cleanHref = href.startsWith('/') ? href.substring(1) : href;
+
+    for (const [asli, sandi] of Object.entries(kamusSandi)) {
+      if (cleanHref.startsWith(asli)) {
+        let newHref = cleanHref.replace(asli, sandi);
+        
+        // Rapikan format link agar sesuai standar Firebase
+        if (sandi === '/') {
+           newHref = '/' + cleanHref.replace(asli, '');
+        } else if (!newHref.startsWith('/')) {
+           newHref = '/' + newHref;
+        }
+        
+        // Terapkan link sandi baru secara diam-diam
+        link.setAttribute('href', newHref);
+      }
+    }
+  });
+});
 
 // ==========================================
 // ENGINE RENDER (SUNTIKAN UI PUBLIK)
@@ -325,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = prompt("Admin Access Required.\nMasukkan Username:");
     if (username === "admin") {
       const password = prompt("Masukkan Password:");
-      if (password === "trisyanto") window.location.href = '/9f8e7d6c5b4a3f2e'; // Mengarah ke link admin rahasia
+      if (password === "trisyanto") window.location.href = '/9f8e7d6c5b4a3f2e';
       else alert("Akses Ditolak!");
     }
   }
@@ -353,7 +401,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
+// ==========================================
+// KODE PELINDUNG ANTI-COPY (KECUALI ADMIN)
+// ==========================================
 const isHalamanAdmin = window.location.href.includes('admin') || window.location.href.includes('9f8e7d6c5b4a3f2e');
 if (!isHalamanAdmin) {
   document.addEventListener('contextmenu', function(e) {
