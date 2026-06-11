@@ -77,12 +77,10 @@
           const serverExp = data.experiences || [];
           const serverSkill = data.skills || [];
 
-          // Update data memori HP secara diam-diam (Silent Update)
           originalSetItem.call(localStorage, 'portfolio_projects', JSON.stringify(serverProj));
           originalSetItem.call(localStorage, 'portfolio_experience', JSON.stringify(serverExp));
           originalSetItem.call(localStorage, 'portfolio_skills', JSON.stringify(serverSkill));
           
-          // Langsung suntikkan ke layar tanpa perlu merefresh (Live Rendering)
           if (!isAdminPage) {
               if (document.getElementById('projectsGrid')) renderProjectsDirectly(serverProj);
               if (document.getElementById('experienceTimeline')) renderExperiencesDirectly(serverExp);
@@ -159,7 +157,7 @@ function renderExperiencesDirectly(experiencesArray) {
 }
 
 // ==========================================
-// KONFIGURASI TELEGRAM BOT & LOKAL DEFAULT
+// KONFIGURASI BOT & LOKAL DEFAULT
 // ==========================================
 const TELEGRAM_BOT_TOKEN = '8964310319:AAFLdHA66XGIBvVEwxxIdTx8H17pph0sk8M'; 
 const TELEGRAM_CHAT_ID = '1838902666'; 
@@ -179,6 +177,55 @@ window.portfolioUtils = {
   }
 };
 window.portfolioUtils.getExperiences = window.portfolioUtils.getExperience;
+
+// ==========================================
+// SISTEM NOTIFIKASI KOTAK (TOAST)
+// ==========================================
+function showFormNotification(message, type = 'success') {
+  const toast = document.createElement('div');
+  const bgColor = type === 'success' ? '#238636' : '#da3633';
+  const icon = type === 'success' ? '✅' : '❌';
+  
+  toast.style.cssText = `
+    position: fixed; 
+    bottom: 20px; 
+    right: 20px; 
+    background: ${bgColor}; 
+    color: white; 
+    padding: 16px 20px; 
+    border-radius: 8px; 
+    z-index: 9999; 
+    font-size: 0.95rem;
+    font-weight: 500; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.3s ease;
+  `;
+  
+  toast.innerHTML = `
+    <span style="display: flex; align-items: center; gap: 8px;"><span>${icon}</span> ${message}</span>
+    <button style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 0.5; margin-left: auto;">&times;</button>
+  `;
+
+  const closeBtn = toast.querySelector('button');
+  closeBtn.addEventListener('click', () => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  });
+
+  document.body.appendChild(toast);
+
+  // Auto hapus setelah 6 detik jika pengguna lupa menekan tombol X
+  setTimeout(() => {
+    if (document.body.contains(toast)) {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }
+  }, 6000);
+}
 
 // ==========================================
 // UI UTAMA: NAVBAR, KONTAK & SHORTCUT ADMIN
@@ -213,24 +260,27 @@ document.addEventListener('DOMContentLoaded', () => {
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (isCooldown) { alert('Mohon tunggu beberapa detik.'); return; }
+      
+      if (isCooldown) { 
+        showFormNotification('Please wait a few seconds before sending another message.', 'error'); 
+        return; 
+      }
 
       const submitBtn = document.getElementById('submitBtn') || contactForm.querySelector('button[type="submit"]');
       const btnText = submitBtn.querySelector('.btn-text') || submitBtn;
       const originalText = btnText.textContent;
       
       submitBtn.disabled = true;
-      btnText.textContent = 'Menyimpan...';
+      btnText.textContent = 'Sending...'; // Diubah ke bahasa Inggris
 
       const formData = new FormData(contactForm);
       const data = {
-        name: formData.get('from_name') || formData.get('name') || document.getElementById('name')?.value || 'Tanpa Nama',
-        email: formData.get('from_email') || formData.get('email') || document.getElementById('email')?.value || 'Tanpa Email',
+        name: formData.get('from_name') || formData.get('name') || document.getElementById('name')?.value || 'Unknown',
+        email: formData.get('from_email') || formData.get('email') || document.getElementById('email')?.value || 'Unknown',
         subject: formData.get('subject') || document.getElementById('subject')?.value || '-',
         message: formData.get('message') || document.getElementById('message')?.value || '-'
       };
 
-      btnText.textContent = 'Sending Message...';
       const textMessage = `🔔 *PESAN BARU PORTFOLIO* 🔔\n\n*Nama:* ${data.name}\n*Email:* ${data.email}\n*Subjek:* ${data.subject}\n\n*Pesan:*\n${data.message}`;
       const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
@@ -242,12 +292,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (response.ok) {
-          alert('Message Sent Successfully!');
+          // Tampilkan Kotak Hijau Sukses tanpa kata Telegram
+          showFormNotification('Message sent successfully!', 'success');
           contactForm.reset();
           isCooldown = true;
           let timeLeft = 10;
+          
+          // Timer 10 detik tetap berjalan di tombol Submit
           const countdownInterval = setInterval(() => {
-            btnText.textContent = `Tunggu ${timeLeft}s...`;
+            btnText.textContent = `Wait ${timeLeft}s...`; // Teks Timer bahasa Inggris
             timeLeft--;
             if (timeLeft < 0) {
               clearInterval(countdownInterval);
@@ -257,12 +310,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }, 1000);
         } else {
-          alert('Message failed to send. Server error.');
+          showFormNotification('Failed to send message. Please try again later.', 'error');
           submitBtn.disabled = false;
           btnText.textContent = originalText;
         }
       } catch (error) {
-        alert('Failed to send message, please check your internet connection.');
+        showFormNotification('Failed to send message. Network error.', 'error');
         submitBtn.disabled = false;
         btnText.textContent = originalText;
       }
